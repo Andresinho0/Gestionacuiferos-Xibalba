@@ -483,13 +483,14 @@ footer small {
 
 /* Contenedor de la tabla: fondo blanco sólido para legibilidad de datos */
 .table-scroll {
-  width: 100%;
+  width: 70%;
   max-height: 55vh;
   overflow-y: auto;
   border-radius: 8px;
   background-color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);
+  margin: 0 auto; /* <-- Se agrega esta línea para centrar el contenedor */
 }
 
 .tabla {
@@ -921,3 +922,93 @@ footer small {
 
 .button-prev { left: 0; border-radius: 0 4px 4px 0; }
 .button-next { right: 0; border-radius: 4px 0 0 4px; }
+
+
+
+/* ==========================================
+   Tarjetas de Nuevo pozo y de listado de pozos
+   ========================================== */
+
+
+    /* Estilos para el sistema de tarjetas dentro del panel */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.tarjeta {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 73, 130, 0.1);
+}
+
+.tarjeta-titulo {
+    color: #004982;
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.form-group input, 
+.form-group select {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+    color: #004982;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus, 
+.form-group select:focus {
+    border-color: #004982;
+}
+
+/* Estilos específicos para los sliders */
+.slider-container {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.slider-value {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: #555;
+    text-align: right;
+}

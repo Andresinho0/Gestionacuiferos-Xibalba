@@ -14,10 +14,11 @@
 <body>
 
   <div class="page-content">
+
+    <!-- Header -->
     <div id="header-container"></div>
 
     <h1 class="main-title">Listado de pozos</h1>
-
     <div class="panel">
 
       <div class="panel-header">
@@ -83,30 +84,24 @@
       <!-- Tabla de pozos -->
 
 
-      <div class="table-scroll">
-        <table class="tabla">
+    <!-- Tabla de pozos -->
+      <div class="table-scroll" style="width: 100%; max-width: 700px; margin: 0 auto;">
+        <table class="tabla" style="width: 100%;">
           <colgroup>
-            <col width="10%">
-            <col width="12%">
             <col width="25%">
-            <col width="24%">
-            <col width="22%">
+            <col width="50%">
+            <col width="25%">
           </colgroup>
           <thead>
             <tr>
               <th>Clave de pozo</th>
               <th>Nombre del pozo</th>
-              <th>Ramal</th>
-              <th>Profundidad de perforación<br>(m)</th>
-              <th>Diámetro de perforación<br>(in)</th>
-              <th>Diámetro ADEME<br>(in)</th>
-     
+              <th>Información</th>
             </tr>
-
           </thead>
           <tbody id="pozosTableBody">
             <tr>
-              <td colspan="7" class="empty-state">Cargando pozos…</td>
+              <td colspan="3" class="empty-state">Cargando pozos…</td>
             </tr>
           </tbody>
         </table>

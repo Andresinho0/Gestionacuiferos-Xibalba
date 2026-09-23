@@ -9,19 +9,27 @@
       tableBody.innerHTML = '';
 
       if (!lista || lista.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay pozos que coincidan con los filtros.</td></tr>';
+        // También cambiamos aquí el colspan a 3
+        tableBody.innerHTML = '<tr><td colspan="3" class="empty-state">No hay pozos que coincidan con los filtros.</td></tr>';
         return;
       }
 
       lista.forEach(item => {
+        // Obtenemos los valores desde el objeto JSON[cite: 2]
+        const clave = item.l_poz_clave || 'N/A';
+        const nombre = item.lp_Nombre || 'Sin nombre';
+        const idPozo = item.id_lp; // Identificador único para mandar a la vista de detalles[cite: 2]
+
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${item.l_poz_clave}</td>
-          <td>${item.lp_Nombre}</td>
-          <td>${item.lp_ramal}</td>
-          <td>${item.lp_Profundidad_perforación} m</td>
-          <td>${item.lp_Diámetro_perforación} in</td>
-          <td>${item.lp_Diámetro_ADEME} in</td>
+          <td>${clave}</td>
+          <td>${nombre}</td>
+          <td>
+            <!-- Botón que hereda tu clase .btn y redirige enviando el ID -->
+            <button class="btn" onclick="window.location.href='Detalles_pozo.html?id=${idPozo}'">
+              <i class="fa-solid fa-list-check"></i> Detalles
+            </button>
+          </td>
         `;
         tableBody.appendChild(row);
       });

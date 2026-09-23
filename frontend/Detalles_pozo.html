@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Pozo - XibalbaData</title>
+    
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+    
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
+    <script src="js/script.js" defer></script>
+
+    <style>
+        /* Estructura Grid idéntica a Nuevo_pozo, pero optimizada para lectura */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tarjeta {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tarjeta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 73, 130, 0.1);
+        }
+
+        .tarjeta-titulo {
+            color: #004982;
+            font-size: 1.15rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Estilos específicos para mostrar datos (Lectura) */
+        .detail-group {
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .detail-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1.05rem;
+            color: #0f172a;
+            font-weight: 300;
+        }
+
+        /* Highlight para valores importantes */
+        .highlight-value {
+            color: #004982;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+  <div class="page-content">
+
+    <div id="header-container"></div>
+
+    <h1 class="main-title">Ficha Técnica del Pozo</h1>
+
+    <div class="panel">
+      
+      <div class="panel-header" style="border-bottom: none; margin-bottom: 0;">
+        <h2>Información Detallada</h2>
+      </div>
+
+      <!-- Contenedor Grid de Tarjetas -->
+      <div class="cards-grid">
+          
+        <!-- TARJETA 1: Datos Generales -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-passport"></i> 1. Datos Generales</h3>
+            
+            <div class="detail-group">
+                <span class="detail-label">Clave del Pozo</span>
+                <span class="detail-value highlight-value" id="det-clave">Cargando...</span>
+            </div>
+            
+            <div class="detail-group">
+                <span class="detail-label">Nombre de Identificación</span>
+                <span class="detail-value" id="det-nombre">Cargando...</span>
+            </div>
+            
+            <div class="detail-group">
+                <span class="detail-label">Ramal</span>
+                <span class="detail-value" id="det-ramal">Cargando...</span>
+            </div>
+            
+            <div class="detail-group">
+                <span class="detail-label">Ubicación / Coordenadas</span>
+                <span class="detail-value" id="det-ubicacion">Cargando...</span>
+            </div>
+        </div>
+
+        <!-- TARJETA 2: Características Físicas -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 2. Características Físicas</h3>
+            
+            <div class="detail-group">
+                <span class="detail-label">Profundidad de Perforación</span>
+                <span class="detail-value"><span id="det-profundidad" class="highlight-value">-</span> metros</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Diámetro de Perforación</span>
+                <span class="detail-value"><span id="det-diam-perf" class="highlight-value">-</span> pulgadas</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Diámetro de ADEME</span>
+                <span class="detail-value"><span id="det-diam-ademe" class="highlight-value">-</span> pulgadas</span>
+            </div>
+        </div>
+
+        <!-- TARJETA 3: Equipamiento y Aportes -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 3. Equipamiento y Aportes</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="detail-group" style="grid-column: span 2;">
+                    <span class="detail-label">Subestación / Circuito</span>
+                    <span class="detail-value"><span id="det-subestacion">-</span> | <span id="det-circuito">-</span></span>
+                </div>
+                
+                <div class="detail-group">
+                    <span class="detail-label">Acueducto</span>
+                    <span class="detail-value" id="det-acueducto">-</span>
+                </div>
+
+                <div class="detail-group">
+                    <span class="detail-label">Comunidad</span>
+                    <span class="detail-value" id="det-comunidad">-</span>
+                </div>
+
+                <div class="detail-group">
+                    <span class="detail-label">Riego</span>
+                    <span class="detail-value" id="det-riego">-</span>
+                </div>
+
+                <div class="detail-group">
+                    <span class="detail-label">P.A. CDMX</span>
+                    <span class="detail-value" id="det-pacdmx">-</span>
+                </div>
+
+                <div class="detail-group">
+                    <span class="detail-label">Telemetría</span>
+                    <span class="detail-value" id="det-telemetria">-</span>
+                </div>
+
+                <div class="detail-group">
+                    <span class="detail-label">UTR</span>
+                    <span class="detail-value" id="det-utr">-</span>
+                </div>
+            </div>
+        </div>
+
+      </div> <!-- /.cards-grid -->
+
+      <!-- Botones de Acción -->
+      <div class="button-container1">
+        <button class="btn" onclick="window.location.href='Listado_pozos.html'" id="backBtn">
+          <i class="fa-solid fa-arrow-left"></i> Regresar al Listado
+        </button>
+      </div>
+
+    </div> <!-- /.panel -->
+
+  </div> <!-- /.page-content -->
+
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i> 
+      Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Extraer el ID de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const idPozo = urlParams.get("id");
+
+        if (!idPozo) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pozo no encontrado',
+                text: 'No se especificó un identificador válido en la URL.'
+            }).then(() => {
+                window.location.href = 'Listado_pozos.html';
+            });
+            return;
+        }
+
+        // 2. Definir la URL base (Usa la variable global de script.js si existe, si no, usa el fallback)
+        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'https://xibalbadata-java-production.up.railway.app/api';
+
+        // 3. Consultar la API de Spring Boot
+        fetch(`${baseUrl}/lista_pozos/${idPozo}`)
+            .then(response => {
+                if (!response.ok) throw new Error("No se pudo cargar la información del pozo.");
+                return response.json();
+            })
+            .then(data => {
+                // Tarjeta 1
+                document.getElementById('det-clave').textContent = data.l_poz_clave || 'Sin registro';
+                document.getElementById('det-nombre').textContent = data.lp_Nombre || 'Sin registro';
+                document.getElementById('det-ramal').textContent = data.lp_ramal || 'No asignado';
+                document.getElementById('det-ubicacion').textContent = data.lp_ubicación || 'No especificada';
+
+                // Tarjeta 2
+                document.getElementById('det-profundidad').textContent = data.lp_Profundidad_perforación || '0';
+                document.getElementById('det-diam-perf').textContent = data.lp_Diámetro_perforación || '0';
+                document.getElementById('det-diam-ademe').textContent = data.lp_Diámetro_ADEME || '0';
+
+                // Tarjeta 3
+                document.getElementById('det-subestacion').textContent = data.lp_subestacion || 'N/A';
+                document.getElementById('det-circuito').textContent = data.lp_circuito_electrico || 'N/A';
+                document.getElementById('det-acueducto').textContent = data.lp_aporta_acueducto || 'No';
+                document.getElementById('det-comunidad').textContent = data.lp_aporta_comunidad || 'No';
+                document.getElementById('det-riego').textContent = data.lp_aporta_riego || 'No';
+                document.getElementById('det-pacdmx').textContent = data.lp_pa_cdmx || 'No';
+                document.getElementById('det-telemetria').textContent = data.lp_telemetria || 'No';
+                document.getElementById('det-utr').textContent = data.lp_utr || 'No';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: 'Ocurrió un problema al traer los datos desde el servidor.'
+                });
+            });
+    });
+  </script>
+
+</body>
+</html>

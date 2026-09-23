@@ -16,95 +16,141 @@
   <div class="page-content">
 
     <!-- Header estandarizado -->
-    <header class="main-header">
-      <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
-        <img src="img/iitca_logo.png" class="logo-img">
-      </a>
-
-      <div class="header-actions">
-        <!-- Notificaciones estilizadas como botón -->
-        <div class="notification-container">
-          <button type="button" class="nav-btn notification-btn" onclick="toggleNotifications()">
-            <i class="fa-solid fa-bell"></i>
-          </button>
-
-          <!-- Buzón de notificaciones -->
-          <div class="notification-dropdown" id="notificationDropdown">
-            <div class="notification-item">Nueva notificación 1</div>
-            <div class="notification-item">Nueva notificación 2</div>
-            <div class="notification-item">Nueva notificación 3</div>
-          </div>
-        </div>
-
-        <a href="index.html" class="nav-btn logout-link">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          Cerrar Sesión
-        </a>
-      </div>
-    </header>
+    <div id="header-container"></div>
 
     <h1 class="main-title">Agregar nuevo pozo</h1>
 
     <div class="panel">
       
-      <div class="panel-header">
-        <h2>Captura de parámetros</h2>
+      <div class="panel-header" style="border-bottom: none; margin-bottom: 0;">
+        <h2>Captura de parámetros del pozo</h2>
       </div>
 
-      <div class="table-scroll">
-        <table class="tabla">
-          <colgroup>
-            <col width="15%">
-            <col width="25%">
-            <col width="20%">
-            <col width="20%">
-            <col width="20%">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Clave de pozo</th>
-              <th>Nombre del pozo</th>
-              <th>Profundidad de perforación</th>
-              <th>Diámetro de perforación</th>
-              <th>Diámetro de ADEME</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <input type="text" id="clavePozo" placeholder="Ej. PZ-01" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; color: #004982; outline: none;">
-              </td>
-              <td>
-                <input type="text" id="nombrePozo" placeholder="Nombre de identificación" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; color: #004982; outline: none;">
-              </td>
-              <td>
-                <h4 style="margin-bottom: 5px; color: #333; font-weight: normal; font-size: 0.95rem;">Metros:</h4>
-                <input type="range" min="30" max="250" value="50" class="slider" id="profundidad" style="width: 100%;">
-                <p style="margin-top: 5px; font-size: 0.9rem; color: #555;">Valor: <b id="valorProfundidad" style="color: #004982;">50</b> m</p>
-              </td>
-              <td>
-                <h4 style="margin-bottom: 5px; color: #333; font-weight: normal; font-size: 0.95rem;">Pulgadas:</h4>
-                <input type="range" min="10" max="40" value="20" class="slider" id="diametroPerforacion" style="width: 100%;">
-                <p style="margin-top: 5px; font-size: 0.9rem; color: #555;">Valor: <b id="valorDiametroPerforacion" style="color: #004982;">20</b> in</p>
-              </td>
-              <td>
-                <h4 style="margin-bottom: 5px; color: #333; font-weight: normal; font-size: 0.95rem;">Pulgadas:</h4>
-                <input type="range" min="10" max="40" value="20" class="slider" id="diametroADEME" style="width: 100%;">
-                <p style="margin-top: 5px; font-size: 0.9rem; color: #555;">Valor: <b id="valorDiametroADEME" style="color: #004982;">20</b> in</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- Contenedor Grid de Tarjetas -->
+      <div class="cards-grid">
+          
+        <!-- TARJETA 1: Datos Generales -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-passport"></i> 1. Datos Generales</h3>
+            
+            <div class="form-group">
+                <label for="nombrePozo">Nombre del Pozo</label>
+                <input type="text" id="nombrePozo" placeholder="Ej. Pozo Norte" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="clavePozo">Clave</label>
+                <input type="text" id="clavePozo" placeholder="Ej. PZ-01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ramal">Ramal</label>
+                <input type="text" id="ramal" placeholder="Ej. Ramal Oriente">
+            </div>
+            
+            <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <input type="text" id="ubicacion" placeholder="Coordenadas o dirección">
+            </div>
+        </div>
 
+        <!-- TARJETA 2: Dimensiones y Perforación -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 2. Características Físicas</h3>
+            
+            <div class="form-group slider-container">
+                <label for="profundidad">Profundidad de perforación</label>
+                <input type="range" min="30" max="250" value="50" class="slider" id="profundidad">
+                <div class="slider-value">Valor: <b id="valorProfundidad" style="color: #001182;">50</b> m</div>
+            </div>
+
+            <div class="form-group slider-container">
+                <label for="diametroPerforacion">Diámetro de perforación</label>
+                <input type="range" min="10" max="40" value="20" class="slider" id="diametroPerforacion">
+                <div class="slider-value">Valor: <b id="valorDiametroPerforacion" style="color: #001182;">20</b> in</div>
+            </div>
+
+            <div class="form-group slider-container">
+                <label for="diametroADEME">Diámetro de ADEME</label>
+                <input type="range" min="10" max="40" value="20" class="slider" id="diametroADEME">
+                <div class="slider-value">Valor: <b id="valorDiametroADEME" style="color: #001182;">20</b> in</div>
+            </div>
+        </div>
+
+        <!-- TARJETA 3: Equipamiento y Distribución -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 3. Equipamiento y Aportes</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="subestacion">Subestación</label>
+                    <input type="text" id="subestacion" placeholder="Ej. Sub-01">
+                </div>
+                
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="circuito">Circuito Eléctrico</label>
+                    <input type="text" id="circuito" placeholder="Ej. Circuito A">
+                </div>
+
+                <div class="form-group">
+                    <label for="aportaAcueducto">Aporta a acueducto</label>
+                    <select id="aportaAcueducto">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="aportaComunidad">Aporta a comunidad</label>
+                    <select id="aportaComunidad">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="aportaRiego">Aporta a riego</label>
+                    <select id="aportaRiego">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="paCdmx">P.A. CDMX</label>
+                    <select id="paCdmx">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="telemetria">Telemetría</label>
+                    <select id="telemetria">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="utr">UTR</label>
+                    <select id="utr">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+      </div> <!-- /.cards-grid -->
+
+      <!-- Botones de Acción -->
       <div class="button-container1">
-        <!-- Botón Regresar con estilo secundario -->
         <button class="btn" onclick="listadopozos()" id="backBtn">
           <i class="fa-solid fa-arrow-left"></i> Regresar
         </button>
-        <!-- Botón Agregar principal -->
         <button class="btn" onclick="guardarPozo()" id="forwardBtn">
-          <i class="fa-solid fa-floppy-disk"></i> Agregar Pozo
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Pozo
         </button>
       </div>
 
@@ -124,60 +170,73 @@
     function actualizarValorSlider(sliderId, valorId) {
         const slider = document.getElementById(sliderId);
         const valor = document.getElementById(valorId);
+        if(!slider || !valor) return;
+        
         valor.textContent = slider.value;
-
         slider.oninput = function() {
             valor.textContent = this.value;
         };
     }
 
-    // Llamar a la función para cada slider
     actualizarValorSlider('profundidad', 'valorProfundidad');
     actualizarValorSlider('diametroPerforacion', 'valorDiametroPerforacion');
     actualizarValorSlider('diametroADEME', 'valorDiametroADEME');
 
-    // Función para guardar el nuevo pozo
+    // Función principal para guardar
     function guardarPozo() {
         const clavePozo = document.getElementById('clavePozo').value.trim();
         const nombrePozo = document.getElementById('nombrePozo').value.trim();
-        const profundidad = document.getElementById('profundidad').value;
-        const diametroPerforacion = document.getElementById('diametroPerforacion').value;
-        const diametroADEME = document.getElementById('diametroADEME').value;
 
-        // Validar campos obligatorios
         if (!clavePozo || !nombrePozo) {
             Swal.fire({
-                icon: 'error',
-                title: '¡Error!',
-                text: 'Por favor, complete todos los campos obligatorios (Clave y Nombre).',
+                icon: 'warning',
+                title: 'Campos requeridos',
+                text: 'Por favor, complete al menos la Clave y el Nombre del pozo.',
             });
             return;
         }
 
-        // Crear el objeto de datos a enviar
+        // Crear el objeto con TODOS los campos de las 3 tarjetas
         const pozoData = {
             l_poz_clave: clavePozo,
             lp_Nombre: nombrePozo,
-            lp_Profundidad_perforación: parseInt(profundidad),
-            lp_Diámetro_perforación: parseInt(diametroPerforacion),
-            lp_Diámetro_ADEME: parseInt(diametroADEME)
+            lp_ramal: document.getElementById('ramal').value.trim(),
+            lp_ubicación: document.getElementById('ubicacion').value.trim(),
+            
+            lp_Profundidad_perforación: parseInt(document.getElementById('profundidad').value),
+            lp_Diámetro_perforación: parseInt(document.getElementById('diametroPerforacion').value),
+            lp_Diámetro_ADEME: parseInt(document.getElementById('diametroADEME').value),
+            
+            lp_subestacion: document.getElementById('subestacion').value.trim(),
+            lp_circuito_electrico: document.getElementById('circuito').value.trim(),
+            lp_aporta_acueducto: document.getElementById('aportaAcueducto').value,
+            lp_aporta_comunidad: document.getElementById('aportaComunidad').value,
+            lp_aporta_riego: document.getElementById('aportaRiego').value,
+            lp_pa_cdmx: document.getElementById('paCdmx').value,
+            lp_telemetria: document.getElementById('telemetria').value,
+            lp_utr: document.getElementById('utr').value
         };
 
-        // Enviar los datos al servidor
-        fetch('http://localhost:8080/api/lista_pozos', {
+        // Enviar los datos usando la variable global de script.js (o fallback a localhost si prefieres)
+        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+
+        fetch(`${baseUrl}/lista_pozos`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(pozoData)
         })
-        .then(response => response.json())
+        .then(response => {
+            if(!response.ok) throw new Error("Error al guardar en el servidor");
+            return response.json();
+        })
         .then(data => {
-            // Un pequeño ajuste: Redirigir HASTA QUE el usuario cierre la alerta de éxito
             Swal.fire({
                 icon: 'success',
-                title: '¡Éxito!',
-                text: 'El pozo se ha guardado correctamente.',
+                title: '¡Pozo Registrado!',
+                text: 'El nuevo pozo se ha guardado correctamente en la base de datos.',
+                confirmButtonColor: '#004982'
             }).then(() => {
                 document.location = 'Listado_pozos.html';
             });
@@ -187,7 +246,7 @@
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
-                text: 'Hubo un problema al guardar el pozo.',
+                text: 'Hubo un problema al guardar el pozo. Verifica la conexión con el servidor.',
             });
         });
     }
