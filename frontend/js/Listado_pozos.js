@@ -135,3 +135,22 @@ document.addEventListener("DOMContentLoaded", function() {
       .catch(error => console.error("Error:", error));
   }
 });
+
+function filtrarPozos() {
+  const filtro = document.getElementById("filtroGeneral").value.toLowerCase().trim();
+
+  // Si no hay texto, dibuja todos los pozos
+  if (!filtro) {
+    pintarFilas(pozosData);
+    return;
+  }
+
+  // Filtra por clave o nombre
+  const filtrados = pozosData.filter(pozo => {
+    const clave = (pozo.l_poz_clave || "").toLowerCase();
+    const nombre = (pozo.lp_Nombre || "").toLowerCase();
+    return clave.includes(filtro) || nombre.includes(filtro);
+  });
+
+  pintarFilas(filtrados);
+}
