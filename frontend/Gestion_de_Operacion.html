@@ -14,38 +14,129 @@
     
     <!-- Scripts propios -->
     <script src="js/script.js" defer></script>
+
+    <style>
+        /* Contenedor Grid para organizar las tarjetas de registros */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Estilos de la tarjeta individual */
+        .registro-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+
+        .registro-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 73, 130, 0.15);
+        }
+
+        /* Encabezado de la tarjeta */
+        .registro-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .registro-header h3 {
+            margin: 0;
+            color: #004982;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-actividad {
+            background: #004982;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        /* Cuerpo de la tarjeta */
+        .registro-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .input-datetime {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+            color: #004982;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* Pie de la tarjeta con acciones */
+        .registro-footer {
+            background: #f1f5f9;
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-ver {
+            color: #004982;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .btn-ver:hover {
+            color: #0284c7;
+        }
+
+        .acciones a {
+            font-size: 1.25rem;
+            margin-left: 12px;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .acciones a:hover {
+            transform: scale(1.15);
+        }
+
+        .icon-accept { color: #28a745; }
+        .icon-cancel { color: #dc3545; }
+        .icon-edit { color: #004982; }
+
+    </style>
 </head>
-<body>
+<body onload="cargaoperaciones()">
 
   <!-- Contenedor flexible principal -->
   <div class="page-content">
 
-    <header class="main-header">
-      <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
-        <img src="img/iitca_logo.png" class="logo-img">
-      </a>
-
-      <div class="header-actions">
-        <!-- Notificaciones estilizadas como botón -->
-        <div class="notification-container">
-          <button type="button" class="nav-btn notification-btn" onclick="toggleNotifications()">
-            <i class="fa-solid fa-bell"></i>
-          </button>
-
-          <!-- Buzón de notificaciones -->
-          <div class="notification-dropdown" id="notificationDropdown">
-            <div class="notification-item">Nueva notificación 1</div>
-            <div class="notification-item">Nueva notificación 2</div>
-            <div class="notification-item">Nueva notificación 3</div>
-          </div>
-        </div>
-
-        <a href="index.html" class="nav-btn logout-link">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          Cerrar Sesión
-        </a>
-      </div>
-    </header>
+    <!-- Header dinámico -->
+    <div id="header-container"></div>
 
     <!-- Título principal -->
     <h1 class="main-title">Gestión de operación</h1>
@@ -53,70 +144,20 @@
     <!-- Contenedor Glassmorphism (Panel estilo cristal) -->
     <div class="panel">
       
-      <div class="panel-header">
+      <div class="panel-header" style="border-bottom: 2px solid rgba(255, 255, 255, 0.2); padding-bottom: 15px;">
         <h2>Datos de operación</h2>
-        <!-- Botón superior si quisieras agregar una función general -->
         <a href="Agregar_registro_operacion.html" class="add-btn">
-          <i class="fa-solid fa-square-plus"></i>
-          Nuevo Registro
+          <i class="fa-solid fa-square-plus"></i> Nueva operación
         </a>
       </div>
 
-      <!-- Contenedor con scroll para la tabla -->
-      <div class="table-scroll">
-        <table class="tabla">
-          <colgroup>
-            <col width="5%">
-            <col width="20%">
-            <col width="20%">
-            <col width="20%">
-            <col width="10%">
-            <col width="15%">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Actividad</th>
-              <th>Fecha y hora de registro</th>
-              <th>Operador</th>
-              <th>Registro</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Fila de ejemplo / captura -->
-            <tr>
-              <td>1</td>
-              <td>Captura en campo</td>
-              <td>
-                <!-- input actualizado al estándar HTML5 -->
-                <input type="datetime-local" class="input-field" style="margin-bottom: 0; padding: 6px;">
-              </td>
-              <td>Juan Pérez</td>
-              <td>
-                <a href="Registro_operacion.html" class="btn-outline" style="color: #004982; border-color: #004982;">
-                  <i class="fa-solid fa-eye"></i> Ver
-                </a>
-              </td>
-              <td>
-                <!-- Iconos de acción limpios usando fontawesome -->
-                <a href="#" onclick="confirmacion()" title="Aceptar" style="margin-right: 8px;">
-                  <i class="fa-solid fa-square-check action-icon" style="color: #28a745;"></i>
-                </a>
-                <a href="Rechazar_cambios_operacion.html" title="Cancelar" style="margin-right: 8px;">
-                  <i class="fa-solid fa-delete-left action-icon" style="color: #dc3545;"></i>
-                </a>
-                <a href="Editar_Operacion.html" title="Editar">
-                  <i class="fa-solid fa-pen-to-square action-icon"></i>
-                </a>
-              </td>
+      <!-- Contenedor Grid en lugar de la tabla -->
+      <div class="cards-grid"> 
+        <!-- Tarjeta de ejemplo (Reemplaza al antiguo <tr>) -->
+        <div class="registro-card"></div> 
+      </div> <!-- /.cards-grid -->
 
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Botón Regresar -->
+  
       <div class="button-container1">
         <button class="btn" onclick="menumain()" id="backBtn">
             <i class="fa-solid fa-arrow-left"></i> Regresar

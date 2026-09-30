@@ -10,85 +10,6 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
-
-    <style>
-        /* Estilos del Grid y Tarjetas */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-
-        .tarjeta {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .tarjeta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 73, 130, 0.1);
-        }
-
-        .tarjeta-titulo {
-            color: #004982;
-            font-size: 1.15rem;
-            margin-top: 0;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #334155;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input, 
-        .form-group select,
-        .form-group textarea {
-            padding: 10px 12px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-family: inherit;
-            color: #004982;
-            outline: none;
-            transition: border-color 0.3s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .form-group input:focus, 
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #004982;
-            box-shadow: 0 0 5px rgba(0, 73, 130, 0.2);
-        }
-
-        .grid-2-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-    </style>
 </head>
 <body>
 
@@ -319,7 +240,7 @@
       <!-- Botones de Acción -->
       <div class="button-container1">
         <button class="btn" onclick="gestiondemtto()" id="backBtn">
-          <i class="fa-solid fa-arrow-left"></i> Regresar
+          <i class="fa-solid fa-arrow-left"></i> Mantenimiento registrado
         </button>
         <button class="btn" onclick="guardarMantenimiento()" id="forwardBtn">
           <i class="fa-solid fa-floppy-disk"></i> Guardar Registro

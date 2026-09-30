@@ -186,6 +186,85 @@ const gestiondeAlerta = () => document.location = "Gestion_de_alerta.html";
 // PETICIONES A LA API: USUARIOS Y OPERADORES
 // ==========================================
 
+function cargaoperaciones() {
+    // Apunta al endpoint de operación
+    fetch(`${API_BASE_URL}/operacion`)
+        .then(response => {
+            if (!response.ok) throw new Error("Error al obtener operaciones");
+            return response.json();
+        })
+        .then(data => {
+            const grid = document.querySelector('.cards-grid');
+            if (!grid) return;
+
+            grid.innerHTML = ''; // Limpiamos las tarjetas estáticas de ejemplo
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 40px;">No hay registros de operación disponibles.</div>';
+                return;
+            }
+
+            data.forEach(op => {
+                // Adaptamos las variables según lo que devuelve tu backend
+                const id = op.id_op || op.id || 'N/A'; 
+                const pozo = op.op_cpozo || 'Sin Pozo';
+                const operador = op.op_operador || 'No asignado';
+                
+                // Formateamos la fecha si existe
+                let fechaFormateada = 'Sin fecha';
+                if (op.op_fecha_captura) {
+                    const fechaObj = new Date(op.op_fecha_captura);
+                    fechaFormateada = fechaObj.toLocaleString('es-MX', { 
+                        year: 'numeric', month: 'short', day: 'numeric', 
+                        hour: '2-digit', minute: '2-digit' 
+                    });
+                }
+
+                // Creamos la tarjeta
+                const card = document.createElement('div');
+                card.className = 'registro-card';
+                card.innerHTML = `
+                    <div class="registro-header">
+                        <h3><i class="fa-solid fa-hashtag"></i> ID: ${id} - ${pozo}</h3>
+                        <span class="badge-actividad">Captura en campo</span>
+                    </div>
+                    
+                    <div class="registro-body">
+                        <div class="detail-group">
+                            <span class="detail-label"><i class="fa-solid fa-user-gear"></i> Operador</span>
+                            <span class="detail-value">${operador}</span>
+                        </div>
+
+                        <div class="detail-group">
+                            <span class="detail-label"><i class="fa-solid fa-clock"></i> Fecha y hora de registro</span>
+                            <span class="detail-value" style="font-size: 0.95rem;">${fechaFormateada}</span>
+                        </div>
+                    </div>
+
+                    <div class="registro-footer">
+                        <a href="Registro_operacion.html?id=${id}" class="btn-ver">
+                            <i class="fa-solid fa-eye"></i> Ver Registro
+                        </a>
+                        
+                        <div class="acciones">
+                            <a href="Editar_Operacion.html?id=${id}" title="Editar" class="icon-edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar operaciones:', error);
+            const grid = document.querySelector('.cards-grid');
+            if (grid) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #dc3545; padding: 40px;">Error al cargar las operaciones desde el servidor.</div>';
+            }
+        });
+}
+
 function cargaoperadores() {
   fetch(`${API_BASE_URL}/operadores`)
       .then(response => response.json())
@@ -472,52 +551,71 @@ function enviarAlerta() {
 
 function agregarregistrooperacion() {
     const dropdown = document.getElementById('dropdown');
-    // Captura el texto de la opción seleccionada de forma más segura
     const clavePozo = dropdown.options[dropdown.selectedIndex]?.text;
     
-    if (!clavePozo) {
-        mostrarAlerta('Por favor complete los campos requeridos.', 'error');
+    const dropdownOp = document.getElementById('dropdownOperador');
+    const operadorSeleccionado = dropdownOp ? dropdownOp.value : '';
+
+    if (!clavePozo || !dropdown.value) {
+        mostrarAlerta('Por favor seleccione una clave de pozo válida.', 'error');
         return;
     }
+
+    if (!operadorSeleccionado) {
+        mostrarAlerta('Por favor seleccione un operador asignado.', 'error');
+        return;
+    }
+
+    const gastoVal = parseFloat(document.getElementById('opGasto')?.value) || 0.0;
 
     const nvoregOp = {
         idLp: parseInt(dropdown.value),
         op_cpozo: clavePozo,
         op_nestatico: document.getElementById('myRange').value,
         op_ndinamico: document.getElementById('myRange1').value,
-        op_gasto: document.getElementById('myRange2').value,
+        op_gasto: gastoVal,
         op_presion: document.getElementById('myRange3').value,
         op_tiempo_op: document.getElementById('tiempodeoperacion').value,
         op_observaciones: document.getElementById('Observaciones').value,
-        op_fecha_captura: new Date(),
-        op_operador: 1
+        op_fecha_captura: new Date().toISOString(),
+        op_operador: operadorSeleccionado
     };
 
     Swal.fire({
-        title: "¿Estas seguro?",
+        title: "¿Estás seguro?",
         text: "¿Los datos ingresados son correctos?",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Si, enviar",
-        cancelButtonText: "No ¡Corregir!"
+        confirmButtonText: "Sí, enviar",
+        cancelButtonText: "No, ¡corregir!"
     }).then((result) => {
-        if (result.value) {
-          fetch(`${API_BASE_URL}/operacion`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(nvoregOp)
-          })
-          .then(response => response.json())
-          .then(() => {
-              mostrarAlerta('El registro se guardó correctamente.', 'success');
-              ['myRange', 'myRange1', 'myRange2', 'myRange3'].forEach(id => document.getElementById(id).value = 0);
-              document.getElementById('Observaciones').value = "";
-              document.getElementById('tiempodeoperacion').value = "";
-          })
-          .catch(error => {
-              console.error('Error:', error);
-              mostrarAlerta('Hubo un problema al guardar el registro.', 'error');
-          });
+        if (result.value || result.isConfirmed) {
+            fetch(`${API_BASE_URL}/operacion`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nvoregOp)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error en la respuesta del servidor: " + response.status);
+                }
+                return response.json();
+            })
+            .then(() => {
+                // Notificación de éxito con redirección automática
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Registro guardado!',
+                    text: 'La operación se guardó correctamente.',
+                    confirmButtonColor: '#004982'
+                }).then(() => {
+                    document.location = 'Gestion_de_Operacion.html';
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('Hubo un problema al guardar el registro.', 'error');
+            });
         }
     });
 }

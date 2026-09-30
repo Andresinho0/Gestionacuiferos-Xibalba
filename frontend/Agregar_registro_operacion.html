@@ -1,214 +1,191 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="CSS/Menu_MAIN.css">
-<script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
-<script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
-    <script src="js/script.js"></script>
-    <title>Agregar registro Operación</title>
-    <style>
-        .slider {
-            width: 300px;
-        }
-    </style>
+    <title>Agregar Registro Operación - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <script src="js/script.js" defer></script>
 </head>
-<header>
-    <a href="Menu_MAIN.html">
-        <i class="fa-solid fa-house" style="color: aliceblue; margin-left: 1200px" ></i>
-      </a>
-      Inicio
-      <a href="index.html">   
-        <i class="fa-solid fa-right-from-bracket" style="color: aliceblue; "></i>
-    
-      </a>
-      Salir
-</header>
-<body>   
+<body>
 
-    <table border="1" cellpadding="15" class="tabla">
-        <caption> <h2>Agregar nuevo registro</h2></caption>
-        <thead>
-            <tr>
-                <th>Concepto</th>
-                <th>Datos</th>
-            </tr>
-        </thead>
-        
-        <tbody>
-            <tr>
-                <td>
-                    <div>
-                        <a>Clave de pozo</a>
-                    </div>
-                </td>
-                <td>
+  <div class="page-content">
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            // Llamada a la API REST para obtener los datos
-                            fetch('http://localhost:8080/api/lista_pozos')
-                                .then(response => response.json())
-                                .then(data => {
-                                    const dropdown = document.getElementById("dropdown");
-                                    dropdown.innerHTML = ''; // Limpiar opciones anteriores
-                                    data.forEach(item => {
-                                        const option = document.createElement("option");
-                                        option.value = item.id_lp;
-                                        option.textContent = item.l_poz_clave;
-                                        dropdown.appendChild(option);
-                                    });
-                                })
-                                .catch(error => console.error('Error al cargar datos:', error));
-                        });
-                    </script>
-                    <form>
-                        <label for="dropdown"></label>
-                        <select id="dropdown" name="dropdown">
-                            <option value=""></option>
-                        </select>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a>Nivel estático</a>
-                </td>
-                <td>
-                    <h4>Profundidad en metros:</h4>
-    
-                        <input type="range" min="0" max="250" value="0" class="slider" id="myRange" required>                        
-                        <p>Valor seleccionado: <span id="valor">0</span></p>
+    <!-- Header container for dynamic content -->
+    <div id="header-container"></div>
 
-                        <script>
-                            const sliderNivelEstatico = document.getElementById("myRange");
-                            const outputNivelEstatico = document.getElementById("valor");
+    <h1 class="main-title">Captura de Operación</h1>
 
-                            // Mostrar el valor inicial
-                            outputNivelEstatico.textContent = sliderNivelEstatico.value;
+    <div class="panel">
+      
+      <div class="panel-header" style="border-bottom: none; margin-bottom: 0;">
+        <h2>Nuevo Registro de Operación</h2>
+      </div>
 
-                            // Actualizar el valor en tiempo real
-                            sliderNivelEstatico.oninput = function() {
-                                outputNivelEstatico.textContent = this.value;
-                            }
-                        </script>
-              
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a>Nivel dinámico</a>
-                </td>
-                <td>
-                    <h4>Profundidad en metros:</h4>
-    
-                        <input type="range" min="0" max="250" value="0" class="slider" id="myRange1" required>
-                        <p>Valor seleccionado: <span id="valor1">0</span></p>
+      <div class="cards-grid">
+          
+        <!-- TARJETA 1: Selección de Pozo, Operador y Estado -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-faucet-drip"></i> 1. Identificación y Control</h3>
+            
+            <div class="form-group">
+                <label for="dropdown">Clave de Pozo</label>
+                <select id="dropdown" name="dropdown" required>
+                    <option value="">Cargando pozos...</option>
+                </select>
+            </div>
 
-                        <script>
-                            const sliderNivelDinamico = document.getElementById("myRange1");
-                            const outputNivelDinamico = document.getElementById("valor1");
+            <!-- Selector de Operador -->
+            <div class="form-group">
+                <label for="dropdownOperador">Operador Asignado</label>
+                <select id="dropdownOperador" name="dropdownOperador" required>
+                    <option value="">Cargando operadores...</option>
+                </select>
+            </div>
 
-                            // Mostrar el valor inicial
-                            outputNivelDinamico.textContent = sliderNivelDinamico.value;
+            <div class="form-group">
+                <label for="opOperando">¿El pozo está operando?</label>
+                <select id="opOperando">
+                    <option value="Si">Sí</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
 
-                            // Actualizar el valor en tiempo real
-                            sliderNivelDinamico.oninput = function() {
-                                outputNivelDinamico.textContent = this.value;
-                            }
-                        </script>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a>Caudal extraido</a>
-                </td>
-                <td>
-                    <h4>Litros/segundo:</h4>
-    
-                    <input type="range" min="0" max="100" value="0" class="slider" id="myRange2" required>
-                    <p>Valor seleccionado: <span id="valor2">10</span></p>
+            <div class="form-group">
+                <label for="tiempodeoperacion">Tiempo de Operación (Horas)</label>
+                <input type="number" step="0.1" id="tiempodeoperacion" placeholder="Ej. 12.5" required>
+            </div>
+        </div>
 
-                    <script>
-                        const sliderCaudalExtraido = document.getElementById("myRange2");
-                        const outputCaudalExtraido = document.getElementById("valor2");
+        <!-- TARJETA 2: Mediciones de Niveles -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-arrows-up-down"></i> 2. Niveles de Agua</h3>
+            
+            <div class="slider-container">
+                <label for="myRange">Nivel Estático (Profundidad m):</label>
+                <input type="range" min="0" max="250" value="0" class="slider" id="myRange" required>
+                <div class="slider-value">Valor seleccionado: <b id="valor" style="color: #004982;">0</b> m</div>
+            </div>
 
-                        // Mostrar el valor inicial
-                        outputCaudalExtraido.textContent = sliderCaudalExtraido.value;
+            <div class="slider-container">
+                <label for="myRange1">Nivel Dinámico (Profundidad m):</label>
+                <input type="range" min="0" max="250" value="0" class="slider" id="myRange1" required>
+                <div class="slider-value">Valor seleccionado: <b id="valor1" style="color: #004982;">0</b> m</div>
+            </div>
+        </div>
 
-                        // Actualizar el valor en tiempo real
-                        sliderCaudalExtraido.oninput = function() {
-                            outputCaudalExtraido.textContent = this.value;
-                        }
-                    </script>
-                </td>
-            </tr>            
-            <tr>
-                <td>
-                    <a>Presión</a>
-                </td>
-                <td>
-                    <h4>Psi</h4>
-    
-                        <input type="range" min="0" max="10" value="0" class="slider" id="myRange3" required>
-                        <p>Valor seleccionado: <span id="valor3">1</span></p>
+        <!-- TARJETA 3: Hidráulica, Gastos y Observaciones -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-gauge-high"></i> 3. Hidráulica, Gasto y Notas</h3>
+            
+            <!-- Campo para op_gasto -->
+            <div class="form-group">
+                <label for="opGasto">Gasto / Caudal de Operación (L/s)</label>
+                <input type="number" step="0.01" id="opGasto" placeholder="Ej. 25.50" required>
+            </div>
 
-                        <script>
-                            const sliderPresionPozo = document.getElementById("myRange3");
-                            const outputPresionPozo = document.getElementById("valor3");
+            <div class="slider-container">
+                <label for="myRange2">Caudal Extraído (L/s):</label>
+                <input type="range" min="0" max="100" value="10" class="slider" id="myRange2" required>
+                <div class="slider-value">Valor seleccionado: <b id="valor2" style="color: #004982;">10</b> L/s</div>
+            </div>
 
-                            // Mostrar el valor inicial
-                            outputPresionPozo.textContent = sliderPresionPozo.value;
+            <div class="slider-container">
+                <label for="myRange3">Presión (PSI):</label>
+                <input type="range" min="0" max="10" value="1" class="slider" id="myRange3" required>
+                <div class="slider-value">Valor seleccionado: <b id="valor3" style="color: #004982;">1</b> PSI</div>
+            </div>
 
-                            // Actualizar el valor en tiempo real
-                            sliderPresionPozo.oninput = function() {
-                                outputPresionPozo.textContent = this.value;
-                            }
-                        </script>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a>Tiempo de operación</a>
-                </td>
-                <td>
-                    <h4>Horas</h4>
-                    <input type="text" id="tiempodeoperacion">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a>Observaciones</a>
-                </td>
-                <td>
-                    <input type="text" id="Observaciones">
-                </td>
-            </tr>
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="Observaciones">Observaciones</label>
+                <textarea id="Observaciones" rows="3" placeholder="Comentarios u observaciones de campo..."></textarea>
+            </div>
+        </div>
 
-        </tbody>
-    </table>
-    <section class="botones">
-       
-        <div class="button-container1">
-          <!-- Botón de Regresar -->
-          <button class="btn" onclick="gestiondeOperacion()" id="backBtn">
-              Regresar
-          </button>
-    
-          <!-- Botón de Avanzar -->
-          <button class="btn" onclick="agregarregistrooperacion()" >
-              Aceptar
-          </button>    
-    </section>
-    <br>
-    <br>
-    <footer>
-        <small>
-          <div class="leyenda"> &copy; Software desarrollado por el Intituto Interamericano de Tecnología y Ciencias del Agua.</span>
-        </small>
-      </footer>
-        <!--Colocar el texto centrado y en la parte inferior de la pantlla-->
-   
+      </div>
+
+      <div class="button-container1">
+        <button class="btn" onclick="gestiondeOperacion()" id="backBtn">
+            <i class="fa-solid fa-arrow-left"></i> Registro de operaciones
+        </button>
+        <button class="btn" onclick="agregarregistrooperacion()" id="forwardBtn">
+            <i class="fa-solid fa-floppy-disk"></i> Aceptar
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <small>
+      <div class="leyenda">&copy; Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.</div>
+    </small>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+
+        // 1. Cargar lista de pozos
+        fetch(`${baseUrl}/lista_pozos`)
+            .then(response => response.json())
+            .then(data => {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.innerHTML = '<option value="">Seleccione un pozo...</option>';
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.id_lp;
+                    option.textContent = item.l_poz_clave;
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar pozos:', error);
+                document.getElementById("dropdown").innerHTML = '<option value="">Error al cargar pozos</option>';
+            });
+
+        // 2. Cargar lista de operadores
+        fetch(`${baseUrl}/operadores`)
+            .then(response => response.json())
+            .then(data => {
+                const dropdownOp = document.getElementById("dropdownOperador");
+                dropdownOp.innerHTML = '<option value="">Seleccione un operador...</option>';
+                data.forEach(op => {
+                    const option = document.createElement("option");
+                    // Se asigna op.o_nombre o su clave de identificación según lo que espere el String del backend
+                    option.value = op.o_nombre || op.o_matricula || op.id_o;
+                    option.textContent = op.o_nombre + (op.o_matricula ? ` (${op.o_matricula})` : '');
+                    dropdownOp.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar operadores:', error);
+                document.getElementById("dropdownOperador").innerHTML = '<option value="">Error al cargar operadores</option>';
+            });
+
+        // 3. Sincronización de sliders
+        function sincronizarSlider(sliderId, valorId) {
+            const slider = document.getElementById(sliderId);
+            const valor = document.getElementById(valorId);
+            if (!slider || !valor) return;
+
+            valor.textContent = slider.value;
+            slider.oninput = function() {
+                valor.textContent = this.value;
+            };
+        }
+
+        sincronizarSlider("myRange", "valor");
+        sincronizarSlider("myRange1", "valor1");
+        sincronizarSlider("myRange2", "valor2");
+        sincronizarSlider("myRange3", "valor3");
+    });
+
+  </script>
+
 </body>
 </html>

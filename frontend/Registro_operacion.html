@@ -1,112 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles de Operación - XibalbaData</title>
+
     <link rel="stylesheet" href="CSS/Menu_MAIN.css">
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
-    <script src="js/script.js"></script>
-
-    <title>Registro operacion</title>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <script src="js/script.js" defer></script>
 </head>
-<header>
-  <a href="Menu_MAIN.html">
-    <i class="fa-solid fa-house" style="color: aliceblue; margin-left: 1200px" ></i>
-  </a>
-  inicio
-  <a >   
-    <i class="fa-solid fa-right-from-bracket"></i>
-  </a>
-  Salir
-</div>
-</header>
 <body>
-    
-    <table border=""1" cellpadding="15" class="tabla">
-        <caption>
-            <h2>Datos enviados por operador</h2>
-        </caption>
-        <thead>
-            <tr>
-                <th>Concepto</th>
-                <th>Datos capturados</th>
-            </tr>
-        </thead>
-        
-        <tbody>
-            <tr>
-                <td>
-                        Clave de pozo
-                </td>
-                <td>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Nivel estático
-                </td>
-                <td>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Nivel dinámico
-                </td>
-                <td>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Caudal extraido
-                </td>
-                <td>
-                    
-                </td>
-            </tr>            <tr>
-                <td>
-                    Presión
-                </td>
-                <td>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Tiempo de operación
-                </td>
-                <td>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Observaciones
-                </td>
-                <td>
-                    <textarea name="" id="" cols="30" rows="10"></textarea>
-                </td>
-            </tr>
 
-        </tbody>
-    </table>
+  <div class="page-content">
 
-    <br>
-    <div class="button-container1">
-      <!-- Botón de Regresar -->
-      <button class="btn" onclick="gestiondeOperacion()" id="backBtn">
-          Regresar
-      </button>
+    <header class="main-header">
+      <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
+        <img src="img/iitca_logo.png" class="logo-img" alt="Logo">
+      </a>
 
-    <footer>
-      <small>
-        <div class="leyenda"> &copy; Software desarrollado por el Intituto Interamericano de Tecnología y Ciencias del Agua.</span>
-      </small>
+      <div class="header-actions">
+        <a href="index.html" class="nav-btn logout-link">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+        </a>
+      </div>
+    </header>
+
+    <h1 class="main-title">Ficha de Operación</h1>
+
+    <div class="panel">
+      
+      <div class="panel-header" style="border-bottom: none; margin-bottom: 0;">
+        <h2>Datos Capturados por el Operador</h2>
+      </div>
+
+      <div class="cards-grid">
+          
+        <!-- TARJETA 1: Identificación y Control -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-faucet-drip"></i> 1. Identificación y Control</h3>
+            
+            <div class="detail-group">
+                <span class="detail-label">Clave de Pozo</span>
+                <span class="detail-value highlight-value" id="det-pozo">Cargando...</span>
+            </div>
+            
+            <div class="detail-group">
+                <span class="detail-label">Operador Asignado</span>
+                <span class="detail-value" id="det-operador">Cargando...</span>
+            </div>
+            
+            <div class="detail-group">
+                <span class="detail-label">Tiempo de Operación</span>
+                <span class="detail-value" id="det-tiempo">Cargando...</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Fecha y Hora de Registro</span>
+                <span class="detail-value" id="det-fecha">Cargando...</span>
+            </div>
+        </div>
+
+        <!-- TARJETA 2: Mediciones de Niveles -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-arrows-up-down"></i> 2. Niveles de Agua</h3>
+            
+            <div class="detail-group">
+                <span class="detail-label">Nivel Estático (Profundidad)</span>
+                <span class="detail-value"><span id="det-nestatico" class="highlight-value">-</span></span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Nivel Dinámico (Profundidad)</span>
+                <span class="detail-value"><span id="det-ndinamico" class="highlight-value">-</span></span>
+            </div>
+        </div>
+
+        <!-- TARJETA 3: Hidráulica y Notas -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-gauge-high"></i> 3. Hidráulica, Gasto y Notas</h3>
+            
+            <div class="detail-group">
+                <span class="detail-label">Caudal Extraído / Gasto</span>
+                <span class="detail-value"><span id="det-gasto" class="highlight-value">-</span></span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Presión</span>
+                <span class="detail-value"><span id="det-presion" class="highlight-value">-</span></span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Observaciones</span>
+                <span class="detail-value" id="det-observaciones" style="font-style: italic;">-</span>
+            </div>
+        </div>
+
+      </div>
+
+      <div class="button-container1">
+        <button class="btn" onclick="window.location.href='Gestion_de_Operacion.html'" id="backBtn" >
+            <i class="fa-solid fa-arrow-left"></i> Regresar al Listado
+        </button>
+        <!-- Nuevo botón para eliminar -->
+        <button class="btn" onclick="borrarOperacionActual()" id="deleteBtn" style="background: #dc3545;">
+            <i class="fa-solid fa-trash"></i> Eliminar Registro
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <small>
+      <div class="leyenda">&copy; Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.</div>
+    </small>
   </footer>
-      <!--Colocar el texto centrado y en la parte inferior de la pantlla-->
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idOp = urlParams.get("id");
+
+        if (!idOp) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ID no encontrado',
+                text: 'No se especificó la operación a consultar.'
+            }).then(() => {
+                window.location.href = 'Gestion_de_Operacion.html';
+            });
+            return;
+        }
+
+        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+
+        fetch(`${baseUrl}/operacion/${idOp}`)
+            .then(response => {
+                if (!response.ok) throw new Error("No se pudo cargar la información de la operación.");
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('det-pozo').textContent = data.op_cpozo || 'Sin registro';
+                document.getElementById('det-operador').textContent = data.op_operador || 'No asignado';
+                document.getElementById('det-tiempo').textContent = data.op_tiempo_op ? `${data.op_tiempo_op} Horas` : '0 Horas';
+                
+                let fechaFormateada = 'Sin fecha';
+                if (data.op_fecha_captura) {
+                    const f = new Date(data.op_fecha_captura);
+                    fechaFormateada = f.toLocaleString('es-MX', { 
+                        year: 'numeric', month: 'short', day: 'numeric', 
+                        hour: '2-digit', minute: '2-digit' 
+                    });
+                }
+                document.getElementById('det-fecha').textContent = fechaFormateada;
+
+                document.getElementById('det-nestatico').textContent = data.op_nestatico ? `${data.op_nestatico} m` : '0 m';
+                document.getElementById('det-ndinamico').textContent = data.op_ndinamico ? `${data.op_ndinamico} m` : '0 m';
+
+                document.getElementById('det-gasto').textContent = data.op_gasto ? `${data.op_gasto} L/s` : '0 L/s';
+                document.getElementById('det-presion').textContent = data.op_presion ? `${data.op_presion} PSI` : '0 PSI';
+                document.getElementById('det-observaciones').textContent = data.op_observaciones || 'Ninguna';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: 'Ocurrió un problema al traer los datos desde el servidor.'
+                });
+            });
+    });
+
+    // Función para borrar el registro actual
+    function borrarOperacionActual() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idOp = urlParams.get("id");
+        if (!idOp) return;
+
+        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¡Esta acción eliminará el registro de operación de la base de datos y no se puede revertir!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#dc3545" // Botón de confirmación en rojo
+        }).then((result) => {
+            if (result.isConfirmed || result.value) {
+                fetch(`${baseUrl}/operacion/${idOp}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("No se pudo eliminar el registro en el servidor.");
+                    }
+                    return response.text(); 
+                })
+                .then(() => {
+                    Swal.fire("¡Borrado!", "El registro ha sido eliminado correctamente.", "success")
+                    .then(() => {
+                        // Redirigir al listado general de operaciones tras borrar
+                        window.location.href = 'Gestion_de_Operacion.html';
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al eliminar:", error);
+                    Swal.fire("Error", "Ocurrió un problema al intentar eliminar el registro.", "error");
+                });
+            }
+        });
+    }
+  </script>
 
 </body>
 </html>
