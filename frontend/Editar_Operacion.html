@@ -260,7 +260,7 @@
             confirmButtonText: "Sí, guardar",
             cancelButtonText: "Cancelar"
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.value || result.isConfirmed) {
                 fetch(`${baseUrl}/operacion/${idOp}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
