@@ -76,6 +76,31 @@
             padding: 20px;
             flex-grow: 1;
         }
+        
+        .detail-group {
+            margin-bottom: 15px;
+        }
+
+        .detail-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1rem;
+            color: #0f172a;
+            font-weight: 500;
+        }
 
         .input-datetime {
             width: 100%;
@@ -130,7 +155,7 @@
 
     </style>
 </head>
-<body onload="cargaoperaciones()">
+<body>
 
   <!-- Contenedor flexible principal -->
   <div class="page-content">
@@ -139,13 +164,14 @@
     <div id="header-container"></div>
 
     <!-- Título principal -->
-    <h1 class="main-title">Gestión de operación</h1>
+    <h1 class="main-title">Gestión de operaciones del pozo</h1>
 
     <!-- Contenedor Glassmorphism (Panel estilo cristal) -->
     <div class="panel">
       
       <div class="panel-header" style="border-bottom: 2px solid rgba(255, 255, 255, 0.2); padding-bottom: 15px;">
-        <h2>Datos de operación</h2>
+        <h2>Historial de operaciones</h2>
+        <!-- El botón "Nueva operación" ahora también podría enviar el id del pozo si lo deseas -->
         <a href="Agregar_registro_operacion.html" class="add-btn">
           <i class="fa-solid fa-square-plus"></i> Nueva operación
         </a>
@@ -153,14 +179,13 @@
 
       <!-- Contenedor Grid en lugar de la tabla -->
       <div class="cards-grid"> 
-        <!-- Tarjeta de ejemplo (Reemplaza al antiguo <tr>) -->
-        <div class="registro-card"></div> 
+        <!-- Las tarjetas dinámicas se inyectarán aquí -->
       </div> <!-- /.cards-grid -->
 
-  
       <div class="button-container1">
-        <button class="btn" onclick="menumain()" id="backBtn">
-            <i class="fa-solid fa-arrow-left"></i> Regresar
+        <!-- Redirigimos a Operacion_pozo.html para volver a la lista de pozos -->
+        <button class="btn" onclick="window.location.href='Operacion_pozo.html'" id="backBtn">
+            <i class="fa-solid fa-arrow-left"></i> Regresar a lista de pozos
         </button>
       </div>
 
@@ -175,6 +200,122 @@
       Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
     </small>
   </footer>
+
+ <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idPozo = urlParams.get("id");
+
+        if (!idPozo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pozo no especificado',
+                text: 'No se seleccionó ningún pozo para visualizar sus operaciones.'
+            }).then(() => {
+                window.location.href = 'Operacion_pozo.html';
+            });
+            return;
+        }
+
+        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'https://xibalbadata-java-production.up.railway.app/api';
+
+        // Obtenemos todas las operaciones y luego filtramos
+        fetch(`${baseUrl}/operacion`)
+            .then(response => {
+                if (!response.ok) throw new Error("Error al obtener operaciones");
+                return response.json();
+            })
+            .then(data => {
+                const grid = document.querySelector('.cards-grid');
+                if (!grid) return;
+                
+                grid.innerHTML = ''; 
+
+                const operacionesFiltradas = (data || []).filter(op => op.idLp == idPozo);
+
+                if (operacionesFiltradas.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 40px;">No hay registros de operación para este pozo.</div>';
+                    return;
+                }
+
+            operacionesFiltradas.forEach(op => {
+                    // Imprimimos el objeto en consola para que, si falla, puedas presionar F12 y ver el nombre exacto
+                    console.log("Datos del pozo evaluado:", op);
+
+                    const id = op.id_op || op.id || 'N/A'; 
+                    const pozo = op.op_cpozo || 'Sin Pozo';
+                    const operador = op.op_operador || 'No asignado';
+                    
+                    // LECTURA DEFENSIVA: Atrapamos cualquier variante que Spring Boot haya generado
+                    const estadoOperando = op.op_operando || op.opOperando || op.op_Operando || op.operando || 'No';
+                    
+                    // Limpiamos espacios extra y pasamos a minúsculas para que "Si", "si", o " SI " funcionen igual
+                    const esActivo = String(estadoOperando).trim().toLowerCase() === 'si' || String(estadoOperando).trim().toLowerCase() === 'sí';
+                    
+                    // Asignamos verde si está activo, rojo si está inactivo
+                    const colorBadge = esActivo ? '#28a745' : '#dc3545'; 
+                    const textoBadge = esActivo ? 'Activo' : 'Inactivo';
+
+                    let fechaFormateada = 'Sin fecha';
+                    if (op.op_fecha_captura) {
+                        const fechaObj = new Date(op.op_fecha_captura);
+                        fechaFormateada = fechaObj.toLocaleString('es-MX', { 
+                            year: 'numeric', month: 'short', day: 'numeric', 
+                            hour: '2-digit', minute: '2-digit' 
+                        });
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'registro-card';
+                    card.innerHTML = `
+                        <div class="registro-header">
+                            <h3><i class="fa-solid fa-hashtag"></i> ID: ${id} - ${pozo}</h3>
+                            <div>
+                                <span class="badge-actividad" style="background-color: ${colorBadge}; margin-right: 5px;">
+                                    ${textoBadge}
+                                </span>
+                                <span class="badge-actividad">Captura en campo</span>
+                            </div>
+                        </div>
+                        
+                        <div class="registro-body">
+
+                            <div class="detail-group">
+                                <span class="detail-label"><i class="fa-solid fa-clock"></i> Fecha y hora de registro</span>
+                                <span class="detail-value" style="font-size: 0.95rem;">${fechaFormateada}</span>
+                            </div>
+
+                            <div class="detail-group">
+                                <span class="detail-label"><i class="fa-solid fa-user-gear"></i> Operador</span>
+                                <span class="detail-value">${operador}</span>
+                            </div>
+
+                        </div>
+
+                        <div class="registro-footer">
+                            <a href="Registro_operacion.html?id=${id}" class="btn-ver">
+                                <i class="fa-solid fa-eye"></i> Ver Registro
+                            </a>
+                            
+                            <div class="acciones">
+                                <a href="Editar_Operacion.html?id=${id}" title="Editar" class="icon-edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar operaciones:', error);
+                const grid = document.querySelector('.cards-grid');
+                if (grid) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #dc3545; padding: 40px;">Error al cargar las operaciones desde el servidor.</div>';
+                }
+            });
+    });
+  </script>
 
 </body>
 </html>

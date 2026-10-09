@@ -180,6 +180,7 @@ const gestiondeOperacion = () => document.location = 'Gestion_de_Operacion.html'
 const gestiondemtto = () => document.location = 'tabla_mantenimiento.html';
 const selectacuyop = () => document.location = 'nvo-usuario-prueba.html';
 const gestiondeAlerta = () => document.location = "Gestion_de_alerta.html";
+const operacionPozo = () => document.location = "Operacion_pozo.html";
 
 
 // ==========================================
@@ -567,6 +568,7 @@ function agregarregistrooperacion() {
     }
 
     const gastoVal = parseFloat(document.getElementById('opGasto')?.value) || 0.0;
+    const estadoOperando = document.getElementById('opOperando') ? document.getElementById('opOperando').value : 'Si';
 
     const nvoregOp = {
         idLp: parseInt(dropdown.value),
@@ -578,7 +580,8 @@ function agregarregistrooperacion() {
         op_tiempo_op: document.getElementById('tiempodeoperacion').value,
         op_observaciones: document.getElementById('Observaciones').value,
         op_fecha_captura: new Date().toISOString(),
-        op_operador: operadorSeleccionado
+        op_operador: operadorSeleccionado,
+        op_operando: estadoOperando 
     };
 
     Swal.fire({
@@ -757,4 +760,62 @@ window.addEventListener('click', function (event) {
     if (notifDropdown) notifDropdown.classList.remove('active');
     if (userDropdown) userDropdown.classList.remove('active');
   }
+});
+
+
+// ==========================================
+// LISTADO DE OPERACION POR POZO
+// ==========================================
+
+function pintarFilasOperacion(lista) {
+  const tableBody = document.getElementById("operacionTableBody");
+  tableBody.innerHTML = '';
+
+  if (!lista || lista.length === 0) {
+    // También cambiamos aquí el colspan a 3
+    tableBody.innerHTML = '<tr><td colspan="3" class="empty-state">No hay pozos que coincidan con los filtros.</td></tr>';
+    return;
+  }
+
+  lista.forEach(item => {
+    // Obtenemos los valores desde el objeto JSON[cite: 2]
+    const clave = item.l_poz_clave || 'N/A';
+    const nombre = item.lp_Nombre || 'Sin nombre';
+    const idPozo = item.id_lp; // Identificador único para mandar a la vista de detalles[cite: 2]
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${clave}</td>
+      <td>${nombre}</td>
+      <td>
+        <!-- Botón que hereda tu clase .btn y redirige enviando el ID -->
+        <button class="btn" onclick="window.location.href='Gestion_de_Operacion.html?id=${idPozo}'">
+          <i class="fa-solid fa-list-check"></i> Operaciones
+        </button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBodyOperacion = document.getElementById("operacionTableBody");
+
+    // Si no estamos en la página de Operacion_pozo.html, detenemos la ejecución
+    if (!tableBodyOperacion) return;
+
+    const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'https://xibalbadata-java-production.up.railway.app/api';
+
+    fetch(`${baseUrl}/lista_pozos`)
+        .then(response => {
+            if (!response.ok) throw new Error("Error en la respuesta del servidor");
+            return response.json();
+        })
+        .then(data => {
+            pintarFilasOperacion(data); // Aquí se inyectan los datos a tu función
+        })
+        .catch(error => {
+            console.error('Error al cargar pozos para operaciones:', error);
+            tableBodyOperacion.innerHTML = '<tr><td colspan="3" class="empty-state">Error al cargar el listado.</td></tr>';
+        });
 });

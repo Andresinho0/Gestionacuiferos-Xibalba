@@ -53,9 +53,10 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="slider-container">
                 <label for="tiempodeoperacion">Tiempo de Operación (Horas)</label>
-                <input type="number" step="0.1" id="tiempodeoperacion" placeholder="Ej. 12.5" required>
+                <input type="range" min="0" max="24" value="0" id="tiempodeoperacion" required>
+                <div class="slider-value">Valor seleccionado: <b id="valorTiempo" style="color: #004982;">0</b> hrs</div>
             </div>
         </div>
 
@@ -65,13 +66,13 @@
             
             <div class="slider-container">
                 <label for="myRange">Nivel Estático (Profundidad m):</label>
-                <input type="range" min="0" max="250" value="0" class="slider" id="myRange" required>
+                <input type="range" min="0" max="250" value="0"  step="0.1" class="slider" id="myRange" required>
                 <div class="slider-value">Valor seleccionado: <b id="valor" style="color: #004982;">0</b> m</div>
             </div>
 
             <div class="slider-container">
                 <label for="myRange1">Nivel Dinámico (Profundidad m):</label>
-                <input type="range" min="0" max="250" value="0" class="slider" id="myRange1" required>
+                <input type="range" min="0" max="250" value="0"  step="0.1" class="slider" id="myRange1" required>
                 <div class="slider-value">Valor seleccionado: <b id="valor1" style="color: #004982;">0</b> m</div>
             </div>
         </div>
@@ -106,7 +107,7 @@
       </div>
 
       <div class="button-container1">
-        <button class="btn" onclick="window.location.href='Gestion_de_Operacion.html'" id="backBtn">
+        <button class="btn" onclick="window.location.href='Operacion_pozo.html'" id="backBtn">
             <i class="fa-solid fa-arrow-left"></i> Regresar
         </button>
         <button class="btn" onclick="actualizarOperacion()" id="forwardBtn">
@@ -220,6 +221,7 @@
             });
         }
         sincronizarSlider("myRange", "valor");
+        sincronizarSlider("tiempodeoperacion", "valorTiempo");
         sincronizarSlider("myRange1", "valor1");
         sincronizarSlider("myRange2", "valor2");
         sincronizarSlider("myRange3", "valor3");
