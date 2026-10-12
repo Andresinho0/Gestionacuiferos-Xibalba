@@ -134,6 +134,7 @@ footer {
   text-align: center;
   padding: 16px 20px;
   width: 100%;
+  margin-top: auto;
   border-top: 2px solid #004982;
   flex-shrink: 0;
 }

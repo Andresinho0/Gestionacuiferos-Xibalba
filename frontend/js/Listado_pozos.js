@@ -154,3 +154,52 @@ function filtrarPozos() {
 
   pintarFilas(filtrados);
 }
+
+
+// ==========================================
+// Header: LÓGICA DE NAVEGACIÓN
+// ==========================================
+
+// ==========================================
+// LÓGICA DE NOTIFICACIONES 
+
+function toggleNotifications() {
+  const dropdown = document.getElementById('notificationDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('active'); 
+  }
+}
+
+
+
+// ==========================================
+// LÓGICA DE PERFIL DE USUARIO 
+
+
+function toggleUserProfile() {
+  const dropdown = document.getElementById('userProfileDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('active');
+    
+    // Si se abre el menú, inyecta los datos de la sesión actual
+    if (dropdown.classList.contains('active')) {
+      document.getElementById('display-nombre').textContent = localStorage.getItem('usuario_nombre') || 'N/A';
+      document.getElementById('display-matricula').textContent = localStorage.getItem('usuario_matricula') || 'N/A';
+      document.getElementById('display-rol').textContent = localStorage.getItem('usuario_rol') || 'N/A';
+    }
+  }
+}
+
+// Reemplaza tu listener actual de 'click' en la ventana por este, 
+// para que cierre tanto las notificaciones como el perfil al hacer clic fuera
+window.addEventListener('click', function (event) {
+  const notifDropdown = document.getElementById('notificationDropdown');
+  const userDropdown = document.getElementById('userProfileDropdown');
+  
+  // Si el clic ocurre fuera de cualquier contenedor de notificaciones/perfil
+  if (!event.target.closest('.notification-container')) {
+    if (notifDropdown) notifDropdown.classList.remove('active');
+    if (userDropdown) userDropdown.classList.remove('active');
+  }
+});
+

@@ -19,29 +19,100 @@
             margin-top: 15px;
         }
 
+        .tarjeta {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tarjeta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 73, 130, 0.1);
+        }
+
+        .tarjeta-titulo {
+            color: #004982;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Estilos para mostrar datos */
+        .detail-group {
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .detail-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1rem;
+            color: #0f172a;
+            font-weight: 500;
+        }
+
         /* Contenedor individual de cada registro */
         .registro-mtto {
             background: #f8fafc;
             border: 1px solid #cbd5e1;
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
 
+        /* ESTILOS DEL ACORDEÓN (DROPDOWN) */
         .registro-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #004982;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            background-color: #ffffff;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .registro-header:hover {
+            background-color: #f1f5f9;
         }
 
         .registro-header h2 {
             color: #004982;
             margin: 0;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
         
         .search-container {
@@ -62,20 +133,51 @@
             font-family: inherit;
             outline: none;
         }
+
+        /* Lógica visual de expansión */
+        .contenido-expandible {
+            display: none;
+            padding: 0 25px 25px 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .registro-mtto.expanded .contenido-expandible {
+            display: block;
+        }
+
+        .chevron-icon {
+            color: #004982;
+            transition: transform 0.3s ease;
+        }
+
+        .registro-mtto.expanded .chevron-icon {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
 
   <!-- Header estandarizado -->
-   <div id="header-container"></div>
+  <header class="main-header">
+    <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
+      <img src="img/iitca_logo.png" class="logo-img">
+    </a>
 
-  <h1 class="main-title">Gestión de Mantenimiento</h1>
+    <div class="header-actions">
+      <a href="index.html" class="nav-btn logout-link">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Cerrar Sesión
+      </a>
+    </div>
+  </header>
+
+  <h1 class="main-title">Registros de Mantenimiento</h1>
 
   <div class="panel">
     
     <div class="panel-header">
       <h2>Listado Detallado</h2>
-      <a href="Registro_mtto.html" class="add-btn">
+      <a href="Nuevo_pozo.html" class="add-btn">
         <i class="fa-regular fa-square-plus"></i> Agregar mantenimiento
       </a>
     </div>
@@ -107,16 +209,10 @@
 
   <script>
       document.addEventListener("DOMContentLoaded", function() {
-          // Usamos la variable global apuntando a Railway o fallback a localhost
           const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
 
           fetch(`${baseUrl}/mantenimiento`)
-              .then(response => {
-                  if (!response.ok) {
-                      throw new Error('Error en la respuesta del servidor');
-                  }
-                  return response.json();
-              })
+              .then(response => response.json())
               .then(data => {
                   const contenedor = document.getElementById("contenedor-mantenimientos");
                   contenedor.innerHTML = ''; 
@@ -131,47 +227,52 @@
                       record.className = "registro-mtto";
                       
                       record.innerHTML = `
-                          <div class="registro-header">
+                          <!-- HEADER DEL DROPDOWN -->
+                          <div class="registro-header" onclick="this.parentElement.classList.toggle('expanded')">
                               <h2><i class="fa-solid fa-wrench"></i> Clave Pozo: ${item.mtto_clave_pozo || 'N/A'}</h2>
-                              <span style="color: #64748b; font-weight: bold;">Fecha: ${item.mtto_fecha_captura ? new Date(item.mtto_fecha_captura).toLocaleDateString() : 'N/A'}</span>
+                              <div class="header-info">
+                                  <span style="color: #64748b; font-weight: bold;">Fecha: ${item.mtto_fecha_captura ? new Date(item.mtto_fecha_captura).toLocaleDateString() : 'N/A'}</span>
+                                  <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                              </div>
                           </div>
                           
-                          <div class="cards-grid">
-                              <!-- TARJETA 1: Motor -->
-                              <div class="tarjeta">
-                                  <h3 class="tarjeta-titulo"><i class="fa-solid fa-gear"></i> 1. Motor</h3>
-                                  <div class="detail-group"><span class="detail-label">Tipo</span><span class="detail-value">${item.mtto_motor_tipo || '-'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Potencia (HP / KW)</span><span class="detail-value">${item.mtto_motor_hp || '0'} HP / ${item.mtto_motor_kw || '0'} KW</span></div>
-                                  <div class="detail-group"><span class="detail-label">Eficiencia</span><span class="detail-value">${item.mtto_motor_eficiencia || '0'}%</span></div>
-                              </div>
+                          <!-- CONTENIDO OCULTO (TARJETAS) -->
+                          <div class="contenido-expandible">
+                              <div class="cards-grid">
+                                  <!-- TARJETA 1: Motor -->
+                                  <div class="tarjeta">
+                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-gear"></i> 1. Motor</h3>
+                                      <div class="detail-group"><span class="detail-label">Tipo</span><span class="detail-value">${item.mtto_motor_tipo || '-'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Potencia (HP / KW)</span><span class="detail-value">${item.mtto_motor_hp || '0'} HP / ${item.mtto_motor_kw || '0'} KW</span></div>
+                                      <div class="detail-group"><span class="detail-label">Eficiencia</span><span class="detail-value">${item.mtto_motor_eficiencia || '0'}%</span></div>
+                                  </div>
 
-                              <!-- TARJETA 2: Equipamiento Eléctrico -->
-                              <div class="tarjeta">
-                                  <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
-                                  <div class="detail-group"><span class="detail-label">Tablero (Tipo / Cap.)</span><span class="detail-value">${item.mtto_tablero_tipo || '-'} / ${item.mtto_tablero_capacidad || '0'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Transformador (Tipo / Cap.)</span><span class="detail-value">${item.mtto_transformador_tipo || '-'} / ${item.mtto_transformador_capacidad || '0'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Transformador Seco</span><span class="detail-value">${item.mtto_trans_seco || '-'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Panel Solar / Baterías</span><span class="detail-value">${item.mtto_panel_solar || '-'} / ${item.mtto_banco_baterias || '-'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Sistema de Tierras</span><span class="detail-value">${item.mtto_sistema_tierras || '-'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Instalación (Ext / Int)</span><span class="detail-value">${item.mtto_electrica_exterior || '-'} / ${item.mtto_electrica_inferior || '-'}</span></div>
-                              </div>
+                                  <!-- TARJETA 2: Equipamiento Eléctrico -->
+                                  <div class="tarjeta">
+                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
+                                      <div class="detail-group"><span class="detail-label">Tablero (Tipo / Cap.)</span><span class="detail-value">${item.mtto_tablero_tipo || '-'} / ${item.mtto_tablero_capacidad || '0'} A</span></div>
+                                      <div class="detail-group"><span class="detail-label">Transformador (Tipo / Cap.)</span><span class="detail-value">${item.mtto_transformador_tipo || '-'} / ${item.mtto_transformador_capacidad || '0'} kVA</span></div>
+                                      <div class="detail-group"><span class="detail-label">Transformador Seco</span><span class="detail-value">${item.mtto_trans_seco || '-'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Panel Solar / Baterías</span><span class="detail-value">${item.mtto_panel_solar || '-'} / ${item.mtto_banco_baterias || '-'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Sistema de Tierras</span><span class="detail-value">${item.mtto_sistema_tierras || '-'}</span></div>
+                                  </div>
 
-                              <!-- TARJETA 3: Medidores y Tubería -->
-                              <div class="tarjeta">
-                                  <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Medidores y Tubería</h3>
-                                  <div class="detail-group"><span class="detail-label">Medidores (Presión / Flujo)</span><span class="detail-value">${item.mtto_medidor_presion || '0'} / ${item.mtto_medidor_flujo || '0'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Medidores N.E. / N.D.</span><span class="detail-value">${item.mtto_medidor_NE || '-'} / ${item.mtt_medidor_ND || '-'}</span></div>
-                                  <div class="detail-group"><span class="detail-label">Tubería (Diámetro / Longitud)</span><span class="detail-value">${item.mtto_tuberia_diametro || '0'} in / ${item.mtto_tuberia_longitud || '0'} m</span></div>
-                                  <div class="detail-group"><span class="detail-label">Poliducto / Sanitaria</span><span class="detail-value">${item.mtto_poliducto || '-'} / ${item.mtto_sanitaria || '-'}</span></div>
-                              </div>
+                                  <!-- TARJETA 3: Medidores y Tubería -->
+                                  <div class="tarjeta">
+                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Medidores y Tubería</h3>
+                                      <div class="detail-group"><span class="detail-label">Medidores (Presión / Flujo)</span><span class="detail-value">${item.mtto_medidor_presion || '0'} / ${item.mtto_medidor_flujo || '0'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Medidores N.E. / N.D.</span><span class="detail-value">${item.mtto_medidor_NE || '-'} / ${item.mtt_medidor_ND || '-'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Tubería (Diámetro / Longitud)</span><span class="detail-value">${item.mtto_tuberia_diametro || '0'} in / ${item.mtto_tuberia_longitud || '0'} m</span></div>
+                                      <div class="detail-group"><span class="detail-label">Poliducto / Sanitaria</span><span class="detail-value">${item.mtto_poliducto || '-'} / ${item.mtto_sanitaria || '-'}</span></div>
+                                  </div>
 
-                              <!-- TARJETA 4: Cableado y Observaciones -->
-                              <div class="tarjeta">
-                                  <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 4. Cableado y Notas</h3>
-                                  <div class="detail-group"><span class="detail-label">Cable Sumergible (Calibre / Long)</span><span class="detail-value">${item.mtto_calibre_sumergible || '-'} / ${item.mtt_longitud_sumergible || '0'} m</span></div>
-                                  <div class="detail-group"><span class="detail-label">Cable Transformador-Arrancador</span><span class="detail-value">Tipo: ${item.mtto_cable_transformador || '-'} | Cal: ${item.mtto_calibre_arrancador || '-'} | ${item.mtto_longitud_arrancador || '0'}m</span></div>
-                                  <div class="detail-group"><span class="detail-label">Cable Arrancador-Bomba</span><span class="detail-value">Tipo: ${item.mtto_cable_bomba || '-'} | Cal: ${item.mtto_calibre_bomba || '-'} | ${item.mtto_longitud_bomba || '0'}m</span></div>
-                                  <div class="detail-group"><span class="detail-label">Observaciones</span><span class="detail-value" style="font-style:italic;">${item.mtto_observaciones || 'Ninguna'}</span></div>
+                                  <!-- TARJETA 4: Cableado y Observaciones -->
+                                  <div class="tarjeta">
+                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 4. Cableado y Notas</h3>
+                                      <div class="detail-group"><span class="detail-label">Cable Transformador-Arrancador</span><span class="detail-value">Tipo: ${item.mtto_cable_transformador || '-'} | Cal: ${item.mtto_calibre_arrancador || '-'} | ${item.mtto_longitud_arrancador || '0'}m</span></div>
+                                      <div class="detail-group"><span class="detail-label">Cable Arrancador-Bomba</span><span class="detail-value">Tipo: ${item.mtto_cable_bomba || '-'} | Cal: ${item.mtto_calibre_bomba || '-'} | ${item.mtto_longitud_bomba || '0'}m</span></div>
+                                      <div class="detail-group"><span class="detail-label">Observaciones</span><span class="detail-value" style="font-style:italic;">${item.mtto_observaciones || 'Ninguna'}</span></div>
+                                  </div>
                               </div>
                           </div>
                       `;
@@ -185,13 +286,12 @@
               });
       });
 
-      // Nueva función para filtrar sobre las tarjetas en lugar de la tabla
+      // La función de filtrado sigue funcionando igual porque lee el textContent (aunque esté oculto)
       function filtrarRegistros() {
           const filtro = document.getElementById("filtroGeneral").value.toLowerCase();
           const registros = document.querySelectorAll(".registro-mtto");
 
           registros.forEach(registro => {
-              // Verifica si el texto de todo el registro contiene lo que se busca
               if (registro.textContent.toLowerCase().includes(filtro)) {
                   registro.style.display = "";
               } else {

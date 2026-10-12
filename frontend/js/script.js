@@ -401,7 +401,7 @@ function crearcuenta() {
     return;
   }
 
-  // 3. Crear el JSON asegurando que us_contrasena lleve el valor capturado
+  // 3. Crear el JSON asegurando que us_contrasena lleve el  capturado
   const nuevoUsuario = {
     us_matricula: matricula,
     us_nombre: nombre,

@@ -40,18 +40,24 @@
             
             <div class="form-group">
                 <label for="motorTipo">Tipo de Motor</label>
-                <input type="text" id="motorTipo" placeholder="Ej. Convencional">
+                <select id="motorTipo">
+                    <option value="">Seleccione una opción</option>
+                    <option value="Convencional">Convencional</option>
+                    <option value="Sumergible">Sumergible</option>
+                </select>
             </div>
 
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label for="motorHp">Potencia (HP)</label>
-                    <input type="number" id="motorHp" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label for="motorKw">Potencia (KW)</label>
-                    <input type="number" id="motorKw" placeholder="0">
-                </div>
+            <!-- Sliders de Potencia -->
+            <div class="slider-container">
+                <label for="motorHp">Potencia (HP):</label>
+                <input type="range" min="30" max="150" value="30" class="slider" id="motorHp">
+                <div class="slider-value">Valor seleccionado: <b id="val_motorHp" style="color: #004982;">30</b> HP</div>
+            </div>
+
+            <div class="slider-container">
+                <label for="motorKw">Potencia (KW):</label>
+                <input type="range" min="30" max="150" value="30" class="slider" id="motorKw">
+                <div class="slider-value">Valor seleccionado: <b id="val_motorKw" style="color: #004982;">30</b> KW</div>
             </div>
             
             <div class="form-group">
@@ -64,15 +70,21 @@
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
             
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label for="tableroTipo">Tablero (Tipo)</label>
-                    <input type="text" id="tableroTipo" placeholder="Ej. Trifásico">
-                </div>
-                <div class="form-group">
-                    <label for="tableroCap">Capacidad (A)</label>
-                    <input type="number" id="tableroCap" placeholder="0">
-                </div>
+            <div class="form-group">
+                <label for="tableroTipo">Tablero (Tipo)</label>
+                <select id="tableroTipo">
+                    <option value="">Seleccione tipo</option>
+                    <option value="Monofásico">Monofásico</option>
+                    <option value="Bifásico">Bifásico</option>
+                    <option value="Trifásico">Trifásico</option>
+                </select>
+            </div>
+
+            <!-- Slider de Capacidad del Tablero -->
+            <div class="slider-container">
+                <label for="tableroCap">Capacidad del Tablero (A):</label>
+                <input type="range" min="50" max="200" value="50" class="slider" id="tableroCap">
+                <div class="slider-value">Valor seleccionado: <b id="val_tableroCap" style="color: #004982;">50</b> A</div>
             </div>
 
             <div class="grid-2-col">
@@ -82,7 +94,12 @@
                 </div>
                 <div class="form-group">
                     <label for="transCap">Capacidad (kVA)</label>
-                    <input type="number" id="transCap" placeholder="0">
+                    <select id="transCap">
+                        <option value="">Seleccione capacidad</option>
+                        <option value="120">120</option>
+                        <option value="220">220</option>
+                        <option value="440">440</option>
+                    </select>
                 </div>
             </div>
 
@@ -113,7 +130,11 @@
 
             <div class="form-group">
                 <label for="transSeco">Transformador Seco</label>
-                <input type="text" id="transSeco" placeholder="Especificar detalles">
+                <select id="transSeco">
+                    <option value="">Seleccione opción</option>
+                    <option value="Elevado">Elevado</option>
+                    <option value="Pedestal">Pedestal</option>
+                </select>
             </div>
         </div>
 
@@ -121,26 +142,35 @@
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Tubería y Medidores</h3>
             
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label for="diametroTuberia">Diámetro Tubería (in)</label>
-                    <input type="number" id="diametroTuberia" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label for="longitudTuberia">Longitud Tubería (m)</label>
-                    <input type="number" id="longitudTuberia" placeholder="0">
-                </div>
+            <div class="form-group">
+                <label for="diametroTuberia">Diámetro Tubería (in)</label>
+                <select id="diametroTuberia">
+                    <option value="">Seleccione diámetro</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="12">12</option>
+                </select>
+            </div>
+            
+            <!-- Slider Longitud Tubería -->
+            <div class="slider-container">
+                <label for="longitudTuberia">Longitud Tubería (m):</label>
+                <input type="range" min="30" max="250" value="30" class="slider" id="longitudTuberia">
+                <div class="slider-value">Valor seleccionado: <b id="val_longitudTuberia" style="color: #004982;">30</b> m</div>
             </div>
 
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label for="medidorPresion">Presión</label>
-                    <input type="number" step="0.01" id="medidorPresion" placeholder="0.00">
-                </div>
-                <div class="form-group">
-                    <label for="medidorFlujo">Flujo</label>
-                    <input type="number" step="0.01" id="medidorFlujo" placeholder="0.00">
-                </div>
+            <!-- Slider Presión -->
+            <div class="slider-container">
+                <label for="medidorPresion">Presión:</label>
+                <input type="range" min="0" max="10" step="0.01" value="0" class="slider" id="medidorPresion">
+                <div class="slider-value">Valor seleccionado: <b id="val_medidorPresion" style="color: #004982;">0</b></div>
+            </div>
+
+            <div class="form-group">
+                <label for="medidorFlujo">Flujo</label>
+                <input type="number" step="0.01" id="medidorFlujo" placeholder="0.00">
             </div>
 
             <div class="grid-2-col">
@@ -181,17 +211,6 @@
         <!-- TARJETA 4: Cableado y Observaciones -->
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 4. Cableado y Notas</h3>
-            
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label for="calibreSumergible">Calibre Sumergible</label>
-                    <input type="text" id="calibreSumergible" placeholder="Ej. 000">
-                </div>
-                <div class="form-group">
-                    <label for="longitudSumergible">Long. Sumergible (m)</label>
-                    <input type="number" id="longitudSumergible" placeholder="0">
-                </div>
-            </div>
 
             <div class="form-group" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
                 <label style="color:#004982;">Cable Transformador - Arrancador</label>
@@ -226,7 +245,13 @@
                         <option value="000">000</option>
                     </select>
                 </div>
-                <input type="number" step="0.01" id="longitudBomba" placeholder="Longitud (m)" style="width: 100%; margin-top: 5px;">
+                
+                <!-- Slider Longitud Cable Arrancador - Bomba -->
+                <div class="slider-container" style="margin-top: 10px;">
+                    <label for="longitudBomba">Longitud (m):</label>
+                    <input type="range" min="0" max="30" value="0" class="slider" id="longitudBomba">
+                    <div class="slider-value">Valor seleccionado: <b id="val_longitudBomba" style="color: #004982;">0</b> m</div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -264,6 +289,27 @@
     const entero = id => { const n = parseInt(val(id), 10); return Number.isNaN(n) ? null : n; };
     const decimal = id => { const n = parseFloat(val(id)); return Number.isNaN(n) ? null : n; };
 
+    // Sincronizar Sliders en tiempo real
+    document.addEventListener("DOMContentLoaded", function() {
+        function sincronizarSlider(sliderId, valorId) {
+            const slider = document.getElementById(sliderId);
+            const valor = document.getElementById(valorId);
+            if (!slider || !valor) return;
+            
+            valor.textContent = slider.value;
+            slider.addEventListener('input', function() {
+                valor.textContent = this.value;
+            });
+        }
+        
+        sincronizarSlider("motorHp", "val_motorHp");
+        sincronizarSlider("motorKw", "val_motorKw");
+        sincronizarSlider("tableroCap", "val_tableroCap");
+        sincronizarSlider("longitudTuberia", "val_longitudTuberia");
+        sincronizarSlider("medidorPresion", "val_medidorPresion");
+        sincronizarSlider("longitudBomba", "val_longitudBomba");
+    });
+
     // Fecha local sin zona horaria ("2026-09-28T12:30:00") para LocalDateTime
     function fechaLocalISO() {
         const date = new Date();
@@ -286,12 +332,12 @@
         // Construir el objeto con los nombres exactos del backend
         const mantenimientoData = {
             mtto_clave_pozo: clavePozo,
-            mtto_motor_tipo: txt('motorTipo'),
+            mtto_motor_tipo: val('motorTipo'),
             mtto_motor_hp: entero('motorHp'),
             mtto_motor_kw: entero('motorKw'),
-            mtto_motor_eficiencia: entero('motorEficiencia'), // Integer en el backend
+            mtto_motor_eficiencia: entero('motorEficiencia'),
 
-            mtto_tablero_tipo: txt('tableroTipo'),
+            mtto_tablero_tipo: val('tableroTipo'),
             mtto_tablero_capacidad: entero('tableroCap'),
             mtto_transformador_tipo: txt('transTipo'),
             mtto_transformador_capacidad: entero('transCap'),
@@ -299,19 +345,16 @@
             mtto_panel_solar: val('panelSolar'),
             mtto_banco_baterias: val('bancoBaterias'),
             mtto_sistema_tierras: val('sistemaTierras'),
-            mtto_trans_seco: txt('transSeco'),
+            mtto_trans_seco: val('transSeco'),
 
             mtto_tuberia_diametro: entero('diametroTuberia'),
             mtto_tuberia_longitud: entero('longitudTuberia'),
             mtto_medidor_presion: decimal('medidorPresion'),
             mtto_medidor_flujo: decimal('medidorFlujo'),
             mtto_medidor_NE: val('medidorNE'),
-            mtto_medidor_ND: val('medidorND'), // Corregido: antes mtt_medidor_ND
+            mtto_medidor_ND: val('medidorND'), 
             mtto_poliducto: val('poliducto'),
             mtto_sanitaria: val('sanitaria'),
-
-            mtto_calibre_sumergible: txt('calibreSumergible'),
-            mtto_longitud_sumergible: entero('longitudSumergible'),
 
             mtto_cable_transformador: val('cableTrans'),
             mtto_calibre_arrancador: val('calibreArrancador'),
