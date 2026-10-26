@@ -88,6 +88,7 @@
 
   <div class="page-content">
 
+    <!-- Header -->
     <div id="header-container"></div>
 
     <h1 class="main-title">Ficha Técnica del Pozo</h1>
@@ -195,6 +196,11 @@
         <button class="btn" onclick="window.location.href='Listado_pozos.html'" id="backBtn">
           <i class="fa-solid fa-arrow-left"></i> Regresar al Listado
         </button>
+
+        <!--Botón para descargar el reporte en PDF -->
+        <button class="btn" onclick="descargarReportePDF()" style="background: #eab308; color: #0f172a;">
+          <i class="fa-solid fa-file-pdf"></i> Descargar Reporte
+        </button>
       </div>
 
     </div> <!-- /.panel -->
@@ -209,10 +215,17 @@
   </footer>
 
   <script>
+
+    // ==========================================
+    // CONFIGURACIÓN GLOBAL Y VARIABLES DE URL
+    // ==========================================
+
+    // Extraer el ID globalmente
+    const urlParams = new URLSearchParams(window.location.search);
+    const idPozo = urlParams.get("id");
+
     document.addEventListener("DOMContentLoaded", function () {
-        // 1. Extraer el ID de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const idPozo = urlParams.get("id");
+        // 1. Extraer el ID de la URL de las funciones globales
 
         if (!idPozo) {
             Swal.fire({
@@ -225,11 +238,8 @@
             return;
         }
 
-        // 2. Definir la URL base (Usa la variable global de script.js si existe, si no, usa el fallback)
-        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'https://xibalbadata-java-production.up.railway.app/api';
-
-        // 3. Consultar la API de Spring Boot
-        fetch(`${baseUrl}/lista_pozos/${idPozo}`)
+        // 2. Consultar la API de Spring Boot
+        fetch(`${API_BASE_URL}/lista_pozos/${idPozo}`)
             .then(response => {
                 if (!response.ok) throw new Error("No se pudo cargar la información del pozo.");
                 return response.json();
@@ -265,6 +275,62 @@
                 });
             });
     });
+
+
+    function descargarReportePDF() {
+        // 1. Extraer el ID del pozo desde la URL actual en las funciones globales
+
+        if (!idPozo) {
+            Swal.fire('Error', 'No se puede generar el reporte porque no hay un pozo seleccionado.', 'error');
+            return;
+        }
+
+        // 2. Mostrar alerta de carga para que el usuario sepa que se está procesando
+        Swal.fire({
+            title: 'Generando reporte...',
+            text: 'Conectando con el servidor, por favor espera.',
+            allowOutsideClick: false,
+            onOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // 4. Hacer la petición GET al endpoint de Spring Boot
+        fetch(`${API_BASE_URL}/reportes/pozo/${idPozo}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Error al generar el PDF en el servidor.");
+                // IMPORTANTE: En lugar de .json(), usamos .blob() para archivos binarios
+                return response.blob(); 
+            })
+            .then(blob => {
+                Swal.close(); // Cerramos la alerta de carga
+
+                // 5. Crear un enlace <a> invisible con JavaScript para forzar la descarga
+                const urlArchivo = window.URL.createObjectURL(blob);
+                const enlaceDescarga = document.createElement('a');
+                
+                enlaceDescarga.style.display = 'none';
+                enlaceDescarga.href = urlArchivo;
+                enlaceDescarga.download = `Ficha_Tecnica_Pozo_${idPozo}.pdf`; // Nombre del archivo a guardar
+                
+                // Inyectamos el enlace, le hacemos clic virtualmente y lo borramos
+                document.body.appendChild(enlaceDescarga);
+                enlaceDescarga.click();
+                
+                // Limpieza de memoria
+                window.URL.revokeObjectURL(urlArchivo);
+                document.body.removeChild(enlaceDescarga);
+            })
+            .catch(error => {
+                console.error('Error al descargar:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Fallo en la descarga',
+                    text: 'Ocurrió un problema al intentar generar el archivo PDF.'
+                });
+            });
+    }
+
   </script>
 
 </body>
