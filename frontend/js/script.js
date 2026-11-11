@@ -3,6 +3,7 @@
 // ==========================================
 // Declaramos la URL base de tu API una sola vez.
 const API_BASE_URL = 'https://xibalbadata-java-production.up.railway.app/api';
+const MAPBOX_TOKEN = "pk.eyJ1IjoiYW5kcmVzaW5obzAiLCJhIjoiY213MzNzdGZoMDZiaDJ5cTN2eHpiZGZoZyJ9.7NqeMv1aZvTKgMaYRJx0qQ";
 
 // ==========================================
 // INICIO DE SESIÓN

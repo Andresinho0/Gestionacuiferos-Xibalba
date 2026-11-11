@@ -6,7 +6,8 @@
     <title>Detalles del Pozo - XibalbaData</title>
     
     <link rel="stylesheet" href="CSS/Menu_MAIN.css">
-    
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
@@ -81,6 +82,20 @@
         .highlight-value {
             color: #004982;
             font-weight: bold;
+        }
+
+        #mapa-pozo {
+            width: 100%;
+            height: 380px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #mapa-aviso {
+            display: none;
+            padding: 30px 10px;
+            text-align: center;
+            color: #64748b;
         }
     </style>
 </head>
@@ -189,6 +204,20 @@
             </div>
         </div>
 
+
+        <!-- TARJETA 4: Ubicación en mapa -->
+        <div class="tarjeta" style="grid-column: 1 / -1;">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-location-dot"></i> 4. Ubicación en Mapa</h3>
+            <div id="mapa-pozo"></div>
+            <div id="mapa-aviso">
+                <i class="fa-solid fa-map-location-dot"></i> Este pozo no tiene una ubicación válida registrada.
+            </div>
+            <a id="mapa-gmaps" href="#" target="_blank" rel="noopener"
+            style="display:none; margin-top:12px; color:#004982; font-weight:300;">
+                <i ></i> Abrir en Google Maps
+            </a>
+        </div>
+
       </div> <!-- /.cards-grid -->
 
       <!-- Botones de Acción -->
@@ -264,6 +293,9 @@
                 document.getElementById('det-pacdmx').textContent = data.lp_pa_cdmx || 'No';
                 document.getElementById('det-telemetria').textContent = data.lp_telemetria || 'No';
                 document.getElementById('det-utr').textContent = data.lp_utr || 'No';
+
+                // Tarjeta 4
+                mostrarMapa(data.lp_ubicacion, data.lp_Nombre || data.l_poz_clave);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -328,6 +360,62 @@
                     text: 'Ocurrió un problema al intentar generar el archivo PDF.'
                 });
             });
+    }
+
+    // Convierte "19° 37' 12.284"" (o con signo negativo / S / W / O) a grados decimales
+    function dmsADecimal(texto) {
+        const nums = texto.match(/\d+(?:\.\d+)?/g);
+        if (!nums) return NaN;
+        const [g, m = 0, s = 0] = nums.map(Number);
+        if (m >= 60 || s >= 60) return NaN;
+        const signo = /[-−SWO]/i.test(texto) ? -1 : 1;
+        return signo * (g + m / 60 + s / 3600);
+    }
+
+    // Recibe '19° 37\' 12.284"/-99° 46\' 38.712"' y devuelve { lat, lng } o null si es inválido
+    function parsearUbicacion(texto) {
+        if (!texto || typeof texto !== 'string') return null;
+        const partes = texto.split('/');
+        if (partes.length !== 2) return null;
+
+        const lat = dmsADecimal(partes[0]);
+        const lng = dmsADecimal(partes[1]);
+
+        if (isNaN(lat) || isNaN(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+        return { lat, lng };
+    }
+
+    function mostrarMapa(textoUbicacion, nombrePozo) {
+        const contenedor = document.getElementById('mapa-pozo');
+        const aviso = document.getElementById('mapa-aviso');
+        const coords = parsearUbicacion(textoUbicacion);
+
+        // Si no hay coordenadas válidas, no se inicializa el mapa (así tampoco gasta una carga)
+        if (!coords || typeof mapboxgl === 'undefined') {
+            contenedor.style.display = 'none';
+            aviso.style.display = 'block';
+            return;
+        }
+
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+
+        const map = new mapboxgl.Map({
+            container: 'mapa-pozo',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            center: [coords.lng, coords.lat],   // Mapbox: primero longitud, luego latitud
+            zoom: 15
+        });
+
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        new mapboxgl.Marker({ color: '#004982' })
+            .setLngLat([coords.lng, coords.lat])
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(nombrePozo || 'Pozo'))
+            .addTo(map);
+
+        const enlace = document.getElementById('mapa-gmaps');
+        enlace.href = `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+        enlace.style.display = 'inline-block';
     }
 
   </script>
