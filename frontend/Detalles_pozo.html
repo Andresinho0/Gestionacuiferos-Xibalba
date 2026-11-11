@@ -230,6 +230,11 @@
         <button class="btn" onclick="descargarReportePDF()" style="background: #eab308; color: #0f172a;">
           <i class="fa-solid fa-file-pdf"></i> Descargar Reporte
         </button>
+
+        <!-- Botón para borrar el pozo -->
+        <button class="btn" onclick="borraPozo(idPozo, () => window.location.href = 'Listado_pozos.html')" style="background: #dc2626; color: #ffffff;">
+            <i class="fa-solid fa-trash"></i> Eliminar Pozo
+        </button>
       </div>
 
     </div> <!-- /.panel -->
@@ -403,7 +408,7 @@
             container: 'mapa-pozo',
             style: 'mapbox://styles/mapbox/satellite-streets-v12',
             center: [coords.lng, coords.lat],   // Mapbox: primero longitud, luego latitud
-            zoom: 15
+            zoom: 14
         });
 
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');

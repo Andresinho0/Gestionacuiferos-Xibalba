@@ -820,3 +820,38 @@ document.addEventListener("DOMContentLoaded", function () {
             tableBodyOperacion.innerHTML = '<tr><td colspan="3" class="empty-state">Error al cargar el listado.</td></tr>';
         });
 });
+
+
+function borraPozo(idPozo, alTerminar) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡Esta acción no se podrá revertir!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, borrar",
+        cancelButtonText: "No, cancelar",
+    }).then((result) => {
+        if (!(result.value || result.isConfirmed)) return;
+
+        fetch(`${API_BASE_URL}/lista_pozos/${idPozo}`, { method: 'DELETE' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("No se pudo eliminar el registro en el servidor.");
+                }
+            })
+            .then(() => Swal.fire({
+                icon: "success",
+                title: "¡Borrado!",
+                text: "El pozo ha sido eliminado correctamente.",
+                timer: 1500,
+                showConfirmButton: false
+            }))
+            .then(() => {
+                if (typeof alTerminar === 'function') alTerminar();
+            })
+            .catch(error => {
+                console.error("Error al eliminar:", error);
+                Swal.fire("Error", "Ocurrió un problema al intentar eliminar el pozo.", "error");
+            });
+    });
+}
