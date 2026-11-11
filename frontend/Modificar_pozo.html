@@ -10,128 +10,282 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
+
+    <style>
+        /* Tarjeta de parámetros de calidad */
+        .calidad-seccion { margin-bottom: 22px; }
+        .calidad-seccion:last-child { margin-bottom: 0; }
+
+        .calidad-subtitulo {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+        }
+
+        .calidad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 0 25px;
+        }
+
+        .calidad-nota {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin: 0 0 18px 0;
+        }
+    </style>
 </head>
 <body>
 
   <div class="page-content">
 
     <!-- Header estandarizado -->
-    <header class="main-header">
-      <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
-        <img src="img/iitca_logo.png" class="logo-img" alt="Logo IITCA">
-      </a>
-      
-      <div class="header-actions">
-        <a href="Menu_MAIN.html" class="nav-btn">
-          <i class="fa-solid fa-house"></i>
-          Inicio
-        </a>
-        <a href="index.html" class="nav-btn logout-link">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          Salir
-        </a>
-      </div>
-    </header>
+    <div id="header-container"></div>
 
     <h1 class="main-title">Modificar datos de pozo</h1>
 
     <div class="panel">
       
-      <div class="panel-header">
-        <h2>Edición de parámetros</h2>
+      <div class="panel-header" style="border-bottom: none; margin-bottom: 0;">
+        <h2>Edición de parámetros del pozo</h2>
       </div>
 
-      <div class="table-scroll">
-        <table class="tabla">
-          <colgroup>
-            <col width="10%">
-            <col width="12%">
-            <col width="12%">
-            <col width="15%">
-            <col width="11%">
-            <col width="11%">
-            <col width="11%">
-            <col width="18%">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Clave de pozo</th>
-              <th>Nombre del pozo</th>
-              <th>Ramal</th>
-              <th>Ubicación</th>
-              <th>Profundidad de perforación</th>
-              <th>Diámetro de perforación</th>
-              <th>Diámetro de ADEME</th>
-              <th>Documentos del pozo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <!-- Dropdown de Clave de Pozo -->
-              <td>
-                <select id="dropdown" name="dropdown" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; color: #004982; outline: none; background-color: white;">
-                  <option value="">Cargando...</option>
-                </select>
-              </td>
-
-              <!-- Nombre y Ramal -->
-              <td>
-                <input type="text" placeholder="Nombre" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; color: #004982; outline: none;">
-              </td>
-              <td>
-                <input type="text" placeholder="Ramal" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; color: #004982; outline: none;">
-              </td>
-
-              <!-- Ubicación -->
-              <td>
-                <article style="display: flex; flex-direction: column; gap: 8px;">
-                  <input type="file" style="font-size: 0.8rem; width: 100%;">
-                  <label style="font-size: 0.85rem; color: #555; text-align: left;">Descripción</label>
-                  <textarea rows="2" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; color: #333; resize: vertical;"></textarea>
-                </article>
-              </td>
-
-              <!-- Sliders -->
-              <td>
-                <h4 style="margin-bottom: 5px; color: #333; font-weight: normal; font-size: 0.9rem;">Metros:</h4>
-                <input type="range" min="30" max="250" value="50" class="slider" id="myRange" style="width: 100%;">
-                <p style="margin-top: 5px; font-size: 0.85rem; color: #555;">Valor: <span id="valor" style="color: #004982; font-weight: bold;">50</span></p>
-              </td>
-              <td>
-                <h4 style="margin-bottom: 5px; color: #333; font-weight: normal; font-size: 0.9rem;">Pulgadas:</h4>
-                <input type="range" min="10" max="40" value="20" class="slider" id="myRange1" style="width: 100%;">
-                <p style="margin-top: 5px; font-size: 0.85rem; color: #555;">Valor: <span id="valor1" style="color: #004982; font-weight: bold;">20</span></p>
-              </td>
-              <td>
-                <h4 style="margin-bottom: 5px; color: #333; font-weight: normal; font-size: 0.9rem;">Pulgadas:</h4>
-                <input type="range" min="10" max="40" value="20" class="slider" id="myRange2" style="width: 100%;">
-                <p style="margin-top: 5px; font-size: 0.85rem; color: #555;">Valor: <span id="valor2" style="color: #004982; font-weight: bold;">20</span></p>
-              </td>
-
-              <!-- Documentos -->
-              <td>
-                <article style="display: flex; flex-direction: column; gap: 8px;">
-                  <input type="file" title="Ingrese documentos históricos en PDF o TXT" style="font-size: 0.8rem; width: 100%;">
-                  <label style="font-size: 0.85rem; color: #555; text-align: left;">Descripción</label>
-                  <textarea rows="2" title="Describa brevemente el contenido del documento" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; color: #333; resize: vertical;"></textarea>
-                  <a href="#" title="Agregar otro documento" style="align-self: center; margin-top: 5px;">
-                    <i class="fa-solid fa-file-circle-plus action-icon" style="font-size: 1.8rem;"></i>
-                  </a>
-                </article>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Selector de pozo -->
+      <div class="tarjeta" style="margin-top: 20px;">
+        <h3 class="tarjeta-titulo"><i class="fa-solid fa-magnifying-glass"></i> Pozo a modificar</h3>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="dropdown">Selecciona el pozo</label>
+            <select id="dropdown" onchange="cargarPozo(this.value)">
+                <option value="">Cargando...</option>
+            </select>
+        </div>
       </div>
 
+      <!-- Formulario: se muestra al elegir un pozo -->
+      <div id="formulario" style="display: none;">
+
+      <!-- Contenedor Grid de Tarjetas -->
+      <div class="cards-grid">
+          
+        <!-- TARJETA 1: Datos Generales -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-passport"></i> 1. Datos Generales</h3>
+            
+            <div class="form-group">
+                <label for="nombrePozo">Nombre del Pozo</label>
+                <input type="text" id="nombrePozo" placeholder="Ej. Pozo Norte" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="clavePozo">Clave</label>
+                <input type="text" id="clavePozo" placeholder="Ej. PZ-01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ramal">Ramal</label>
+                <input type="text" id="ramal" placeholder="Ej. Ramal Oriente">
+            </div>
+            
+            <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <input type="text" id="ubicacion" placeholder="Coordenadas: Latitud / Longitud">
+            </div>
+
+            <div class="form-group">
+                <label for="altura">Altura (msnm)</label>
+                <input type="text" inputmode="decimal" id="altura" placeholder="Ej. 2536">
+            </div>
+        </div>
+
+        <!-- TARJETA 2: Dimensiones y Perforación -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 2. Características Físicas</h3>
+            
+            <div class="form-group slider-container">
+                <label for="profundidad">Profundidad de perforación</label>
+                <input type="range" min="30" max="250" value="50" class="slider" id="profundidad">
+                <div class="slider-value">Valor: <b id="valorProfundidad" style="color: #001182;">50</b> m</div>
+            </div>
+
+            <div class="form-group slider-container">
+                <label for="diametroPerforacion">Diámetro de perforación</label>
+                <input type="range" min="10" max="40" value="20" class="slider" id="diametroPerforacion">
+                <div class="slider-value">Valor: <b id="valorDiametroPerforacion" style="color: #001182;">20</b> in</div>
+            </div>
+
+            <div class="form-group slider-container">
+                <label for="diametroADEME">Diámetro de ADEME</label>
+                <input type="range" min="10" max="40" value="20" class="slider" id="diametroADEME">
+                <div class="slider-value">Valor: <b id="valorDiametroADEME" style="color: #001182;">20</b> in</div>
+            </div>
+        </div>
+
+        <!-- TARJETA 3: Equipamiento y Distribución -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 3. Equipamiento y Aportes</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="subestacion">Subestación</label>
+                    <input type="text" id="subestacion" placeholder="Ej. Sub-01">
+                </div>
+                
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="circuito">Circuito Eléctrico</label>
+                    <input type="text" id="circuito" placeholder="Ej. Circuito A">
+                </div>
+
+                <div class="form-group">
+                    <label for="aportaAcueducto">Aporta a acueducto</label>
+                    <select id="aportaAcueducto">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="aportaComunidad">Aporta a comunidad</label>
+                    <select id="aportaComunidad">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="aportaRiego">Aporta a riego</label>
+                    <select id="aportaRiego">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="paCdmx">P.A. CDMX</label>
+                    <select id="paCdmx">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="telemetria">Telemetría</label>
+                    <select id="telemetria">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="utr">UTR</label>
+                    <select id="utr">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA 4: Parámetros de calidad -->
+        <div class="tarjeta" style="grid-column: 1 / -1;">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-flask-vial"></i> 4. Parámetros de Calidad del Agua</h3>
+            <p class="calidad-nota">Opcional. Si el pozo aún no tiene parámetros registrados, se crean al guardar.</p>
+            <p id="calidad-multiple" class="calidad-nota" style="display: none;"></p>
+
+            <div class="calidad-seccion">
+                <h4 class="calidad-subtitulo">Parámetros de campo</h4>
+                <div class="calidad-grid">
+                    <div class="form-group">
+                        <label for="cal-temperatura">Temperatura (°C)</label>
+                        <input type="number" step="any" id="cal-temperatura" placeholder="Ej. 27.29">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-ph">pH</label>
+                        <input type="number" step="any" id="cal-ph" placeholder="Ej. 7.34">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-ce">Conductividad eléctrica CE (µS/cm)</label>
+                        <input type="number" step="any" id="cal-ce" placeholder="Ej. 202">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-sdt">Sólidos disueltos totales SDT (ppm)</label>
+                        <input type="number" step="any" id="cal-sdt" placeholder="Ej. 101">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-eh">Potencial redox Eh (mV)</label>
+                        <input type="number" step="any" id="cal-eh" placeholder="Ej. 135">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-od-pct">Oxígeno disuelto OD (%)</label>
+                        <input type="number" step="any" id="cal-od-pct" placeholder="Ej. 55">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-od-mgl">Oxígeno disuelto OD (mg/L)</label>
+                        <input type="number" step="any" id="cal-od-mgl" placeholder="Ej. 3.4">
+                    </div>
+                </div>
+            </div>
+
+            <div class="calidad-seccion">
+                <h4 class="calidad-subtitulo">Química del agua</h4>
+                <div class="calidad-grid">
+                    <div class="form-group">
+                        <label for="cal-cloruros">Cloruros Cl⁻ (mg/L)</label>
+                        <input type="number" step="any" id="cal-cloruros" placeholder="Ej. 16.4">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-nitratos">Nitratos N-NO₃⁻ (mg/L)</label>
+                        <input type="text" id="cal-nitratos" placeholder="Ej. 0.31, 0.04* o N.D">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-sulfatos">Sulfatos SO₄²⁻ (mg/L)</label>
+                        <input type="number" step="any" id="cal-sulfatos" placeholder="Ej. 5">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-alcalinidad">Alcalinidad (mg CaCO₃/L)</label>
+                        <input type="number" step="any" id="cal-alcalinidad" placeholder="Ej. 81.2">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-bicarbonatos">Bicarbonatos HCO₃⁻ (mg/L)</label>
+                        <input type="number" step="any" id="cal-bicarbonatos" placeholder="Ej. 98.85">
+                    </div>
+                </div>
+            </div>
+
+            <div class="calidad-seccion">
+                <h4 class="calidad-subtitulo">Microbiología</h4>
+                <div class="calidad-grid">
+                    <div class="form-group">
+                        <label for="cal-coliformes">Coliformes totales</label>
+                        <select id="cal-coliformes">
+                            <option value="">Sin dato</option>
+                            <option value="Negativo">Negativo</option>
+                            <option value="Positivo">Positivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-ecoli">E. coli</label>
+                        <select id="cal-ecoli">
+                            <option value="">Sin dato</option>
+                            <option value="Negativo">Negativo</option>
+                            <option value="Positivo">Positivo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div> <!-- /.cards-grid -->
+
+      </div> <!-- /#formulario -->
+
+      <!-- Botones de Acción -->
       <div class="button-container1">
-        <!-- Botón de Regresar (Estilo secundario transparente) -->
-        <button class="btn" onclick="listadopozo()" id="backBtn">
+        <button class="btn" onclick="window.location.href='Listado_pozos.html'" id="backBtn">
           <i class="fa-solid fa-arrow-left"></i> Regresar
         </button>
-        <!-- Botón de Guardar (Estilo primario sólido) -->
-        <button class="btn" onclick="modificaciondatos()" id="forwardBtn">
-          <i class="fa-solid fa-floppy-disk"></i> Continuar
+        <button class="btn" onclick="guardarCambios()" id="forwardBtn" disabled>
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
         </button>
       </div>
 
@@ -146,44 +300,370 @@
     </small>
   </footer>
 
-  <!-- Unificación de lógica de JavaScript al final del documento -->
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // 1. Llamada a la API REST para cargar el Dropdown de pozos
-        fetch('http://localhost:8080/api/lista_pozos')
-            .then(response => response.json())
+    // ==========================================
+    // ESTADO Y UTILIDADES
+    // ==========================================
+
+    let idPozoActual = null;      // Id_lp del pozo cargado
+    let calidadIdActual = null;   // id del registro de parametros_calidad (null si el pozo aún no tiene)
+    let calidadDisponible = false; // false si no se pudieron cargar los parámetros: en ese caso no se tocan al guardar
+    let cargaToken = 0;           // evita que una respuesta tardía pise a una selección más reciente
+
+    const IDS_SLIDERS = [
+        ['profundidad', 'valorProfundidad'],
+        ['diametroPerforacion', 'valorDiametroPerforacion'],
+        ['diametroADEME', 'valorDiametroADEME']
+    ];
+
+    // id del input -> propiedad JSON de parametros_calidad
+    const CAMPOS_CALIDAD_NUM = [
+        ['cal-temperatura', 'temperaturaC'],
+        ['cal-ph', 'ph'],
+        ['cal-ce', 'ceUsCm'],
+        ['cal-sdt', 'sdtPpm'],
+        ['cal-eh', 'ehMv'],
+        ['cal-od-pct', 'odPorcentaje'],
+        ['cal-od-mgl', 'odMgL'],
+        ['cal-cloruros', 'clorurosMgL'],
+        ['cal-sulfatos', 'sulfatosMgL'],
+        ['cal-alcalinidad', 'alcalinidadMgCaco3L'],
+        ['cal-bicarbonatos', 'bicarbonatosMgL']
+    ];
+
+    function apiUrl() {
+        return typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+    }
+
+    function el(id) { return document.getElementById(id); }
+
+    // Lee un input numérico: vacío -> null, si no el número
+    function valorNumero(id) {
+        const v = el(id).value.trim();
+        if (v === '') return null;
+        const n = Number(v);
+        return isNaN(n) ? null : n;
+    }
+
+    // Lee un input de texto o select: vacío -> null
+    function valorTexto(id) {
+        const v = el(id).value.trim();
+        return v === '' ? null : v;
+    }
+
+    function ponerValor(id, valor) {
+        el(id).value = (valor === null || valor === undefined) ? '' : valor;
+    }
+
+    // Select: si el valor guardado no está entre las opciones, se agrega para no perder el dato
+    function fijarSelect(id, valor, porDefecto) {
+        const sel = el(id);
+        sel.querySelectorAll('option[data-extra]').forEach(o => o.remove());
+        const v = (valor === null || valor === undefined || String(valor).trim() === '') ? porDefecto : String(valor).trim();
+        if (!Array.from(sel.options).some(o => o.value === v)) {
+            const o = document.createElement('option');
+            o.value = v;
+            o.textContent = v;
+            o.dataset.extra = '1';
+            sel.appendChild(o);
+        }
+        sel.value = v;
+    }
+
+    // Slider: amplía su rango si el valor guardado queda fuera, para no alterarlo al guardar
+    function fijarSlider(sliderId, salidaId, valor) {
+        const slider = el(sliderId);
+        slider.min = slider.dataset.min;
+        slider.max = slider.dataset.max;
+        const n = Number(valor);
+        if (valor !== null && valor !== undefined && valor !== '' && !isNaN(n)) {
+            if (n < Number(slider.min)) slider.min = n;
+            if (n > Number(slider.max)) slider.max = n;
+            slider.value = n;
+        } else {
+            slider.value = slider.defaultValue;
+        }
+        el(salidaId).textContent = slider.value;
+    }
+
+    function setCalidadHabilitada(habilitada) {
+        const tarjeta = el('cal-temperatura').closest('.tarjeta');
+        tarjeta.querySelectorAll('input, select').forEach(c => { c.disabled = !habilitada; });
+    }
+
+    // ==========================================
+    // CARGA DE DATOS
+    // ==========================================
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Sliders: valor en tiempo real y rango original
+        IDS_SLIDERS.forEach(([sliderId, salidaId]) => {
+            const slider = el(sliderId);
+            slider.dataset.min = slider.min;
+            slider.dataset.max = slider.max;
+            slider.addEventListener('input', function () { el(salidaId).textContent = this.value; });
+        });
+
+        // Dropdown de pozos
+        fetch(`${apiUrl()}/lista_pozos`)
+            .then(response => {
+                if (!response.ok) throw new Error('No se pudo cargar el listado de pozos.');
+                return response.json();
+            })
             .then(data => {
-                const dropdown = document.getElementById("dropdown");
+                const dropdown = el('dropdown');
                 dropdown.innerHTML = '<option value="">Seleccione un pozo</option>';
                 data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.l_poz_clave;
-                    option.textContent = item.l_poz_clave;
+                    const option = document.createElement('option');
+                    option.value = item.id_lp;
+                    option.textContent = item.lp_Nombre ? `${item.l_poz_clave} – ${item.lp_Nombre}` : item.l_poz_clave;
                     dropdown.appendChild(option);
                 });
+
+                // Si se llegó desde otra pantalla con ?id=, se abre ese pozo directamente
+                const idUrl = new URLSearchParams(window.location.search).get('id');
+                if (idUrl && Array.from(dropdown.options).some(o => o.value === idUrl)) {
+                    dropdown.value = idUrl;
+                    cargarPozo(idUrl);
+                }
             })
             .catch(error => {
                 console.error('Error al cargar datos:', error);
-                document.getElementById("dropdown").innerHTML = '<option value="">Error de conexión</option>';
+                el('dropdown').innerHTML = '<option value="">Error de conexión</option>';
             });
+    });
 
-        // 2. Control de Sliders unificado
-        function bindSlider(sliderId, outputId) {
-            const slider = document.getElementById(sliderId);
-            const output = document.getElementById(outputId);
-            
-            if (slider && output) {
-                output.textContent = slider.value;
-                slider.addEventListener('input', function() {
-                    output.textContent = this.value;
+    function llenarPozo(d) {
+        ponerValor('clavePozo', d.l_poz_clave);
+        ponerValor('nombrePozo', d.lp_Nombre);
+        ponerValor('ramal', d.lp_ramal);
+        ponerValor('ubicacion', d.lp_ubicacion);
+        ponerValor('altura', d.lp_altura);
+
+        fijarSlider('profundidad', 'valorProfundidad', d.lp_Profundidad_perforación);
+        fijarSlider('diametroPerforacion', 'valorDiametroPerforacion', d.lp_Diámetro_perforación);
+        fijarSlider('diametroADEME', 'valorDiametroADEME', d.lp_Diámetro_ADEME);
+
+        ponerValor('subestacion', d.lp_subestacion);
+        ponerValor('circuito', d.lp_circuito_electrico);
+        fijarSelect('aportaAcueducto', d.lp_aporta_acueducto, 'No');
+        fijarSelect('aportaComunidad', d.lp_aporta_comunidad, 'No');
+        fijarSelect('aportaRiego', d.lp_aporta_riego, 'No');
+        fijarSelect('paCdmx', d.lp_pa_cdmx, 'No');
+        fijarSelect('telemetria', d.lp_telemetria, 'No');
+        fijarSelect('utr', d.lp_utr, 'No');
+    }
+
+    function llenarCalidad(r) {
+        CAMPOS_CALIDAD_NUM.forEach(([id, clave]) => ponerValor(id, r[clave]));
+        ponerValor('cal-nitratos', r.nitratosMgL);
+        fijarSelect('cal-coliformes', r.coliformesTotales, '');
+        // Lombok/Jackson expone E. coli como "ecoli"; se acepta también "eColi" por si se renombra
+        fijarSelect('cal-ecoli', r.ecoli !== undefined ? r.ecoli : r.eColi, '');
+    }
+
+    function limpiarCalidad() {
+        CAMPOS_CALIDAD_NUM.forEach(([id]) => ponerValor(id, ''));
+        ponerValor('cal-nitratos', '');
+        fijarSelect('cal-coliformes', '', '');
+        fijarSelect('cal-ecoli', '', '');
+        el('calidad-multiple').style.display = 'none';
+    }
+
+    async function cargarPozo(id) {
+        const token = ++cargaToken;
+
+        idPozoActual = null;
+        calidadIdActual = null;
+        calidadDisponible = false;
+        el('forwardBtn').disabled = true;
+
+        if (!id) {
+            el('formulario').style.display = 'none';
+            return;
+        }
+
+        try {
+            // 1. Datos del pozo
+            const resp = await fetch(`${apiUrl()}/lista_pozos/${id}`);
+            if (!resp.ok) throw new Error('No se pudo cargar la información del pozo.');
+            const pozo = await resp.json();
+            if (token !== cargaToken) return;
+            if (!pozo) throw new Error('El pozo no existe.');
+
+            llenarPozo(pozo);
+
+            // 2. Parámetros de calidad (se cargan aparte: un fallo aquí no impide editar el pozo)
+            limpiarCalidad();
+            try {
+                const r = await fetch(`${apiUrl()}/parametros_calidad/pozo/${id}`);
+                if (!r.ok) throw new Error('No se pudieron cargar los parámetros de calidad.');
+                const lista = await r.json();
+                if (token !== cargaToken) return;
+
+                calidadDisponible = true;
+                if (Array.isArray(lista) && lista.length > 0) {
+                    calidadIdActual = lista[0].id;
+                    llenarCalidad(lista[0]);
+                    if (lista.length > 1) {
+                        const aviso = el('calidad-multiple');
+                        aviso.textContent = `Este pozo tiene ${lista.length} muestras registradas; aquí se edita la primera.`;
+                        aviso.style.display = 'block';
+                    }
+                }
+            } catch (errorCalidad) {
+                if (token !== cargaToken) return;
+                console.error('Error:', errorCalidad);
+                calidadDisponible = false;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Parámetros de calidad no disponibles',
+                    text: 'No se pudieron cargar los parámetros de calidad. Puedes editar el pozo; los parámetros no se modificarán.'
                 });
+            }
+
+            setCalidadHabilitada(calidadDisponible);
+            idPozoActual = Number(pozo.id_lp !== undefined ? pozo.id_lp : id);
+            el('formulario').style.display = 'block';
+            el('forwardBtn').disabled = false;
+
+        } catch (error) {
+            if (token !== cargaToken) return;
+            console.error('Error:', error);
+            el('formulario').style.display = 'none';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'Ocurrió un problema al traer los datos desde el servidor.'
+            });
+        }
+    }
+
+    // ==========================================
+    // GUARDADO
+    // ==========================================
+
+    async function guardarCambios() {
+        if (!idPozoActual) return;
+
+        const clavePozo = el('clavePozo').value.trim();
+        const nombrePozo = el('nombrePozo').value.trim();
+
+        if (!clavePozo || !nombrePozo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos requeridos',
+                text: 'Por favor, complete al menos la Clave y el Nombre del pozo.',
+            });
+            return;
+        }
+
+        const phValor = valorNumero('cal-ph');
+        if (calidadDisponible && phValor !== null && (phValor < 0 || phValor > 14)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'pH fuera de rango',
+                text: 'El pH debe estar entre 0 y 14.',
+            });
+            return;
+        }
+
+        const pozoData = {
+            id_lp: idPozoActual,
+            l_poz_clave: clavePozo,
+            lp_Nombre: nombrePozo,
+            lp_ramal: el('ramal').value.trim(),
+            lp_ubicacion: el('ubicacion').value.trim(),
+            lp_altura: el('altura').value.trim() || null,
+
+            lp_Profundidad_perforación: parseInt(el('profundidad').value),
+            lp_Diámetro_perforación: parseInt(el('diametroPerforacion').value),
+            lp_Diámetro_ADEME: parseInt(el('diametroADEME').value),
+
+            lp_subestacion: el('subestacion').value.trim(),
+            lp_circuito_electrico: el('circuito').value.trim(),
+            lp_aporta_acueducto: el('aportaAcueducto').value,
+            lp_aporta_comunidad: el('aportaComunidad').value,
+            lp_aporta_riego: el('aportaRiego').value,
+            lp_pa_cdmx: el('paCdmx').value,
+            lp_telemetria: el('telemetria').value,
+            lp_utr: el('utr').value
+        };
+
+        const calidadData = {
+            pozoId:              idPozoActual,   // el PUT del backend copia pozoId: no debe ir vacío
+            temperaturaC:        valorNumero('cal-temperatura'),
+            ph:                  phValor,
+            ceUsCm:              valorNumero('cal-ce'),
+            sdtPpm:              valorNumero('cal-sdt'),
+            ehMv:                valorNumero('cal-eh'),
+            odPorcentaje:        valorNumero('cal-od-pct'),
+            odMgL:               valorNumero('cal-od-mgl'),
+            clorurosMgL:         valorNumero('cal-cloruros'),
+            nitratosMgL:         valorTexto('cal-nitratos'),   // texto: admite "0.04*" y "N.D"
+            sulfatosMgL:         valorNumero('cal-sulfatos'),
+            alcalinidadMgCaco3L: valorNumero('cal-alcalinidad'),
+            bicarbonatosMgL:     valorNumero('cal-bicarbonatos'),
+            coliformesTotales:   valorTexto('cal-coliformes'),
+            ecoli:               valorTexto('cal-ecoli')
+        };
+        const hayCalidad = Object.entries(calidadData).some(([k, v]) => k !== 'pozoId' && v !== null);
+
+        const btn = el('forwardBtn');
+        btn.disabled = true;
+        const cabeceras = { 'Content-Type': 'application/json' };
+
+        // Paso 1: actualizar el pozo
+        try {
+            const resp = await fetch(`${apiUrl()}/lista_pozos/${idPozoActual}`, {
+                method: 'PUT',
+                headers: cabeceras,
+                body: JSON.stringify(pozoData)
+            });
+            if (!resp.ok) throw new Error('Error al guardar en el servidor');
+            const texto = await resp.text();
+            if (!texto) throw new Error('El pozo no existe en el servidor');
+        } catch (error) {
+            console.error('Error al actualizar el pozo:', error);
+            btn.disabled = false;
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: 'Hubo un problema al guardar los cambios. Verifica la conexión con el servidor.',
+            });
+            return;
+        }
+
+        // Paso 2: parámetros de calidad (actualiza el registro existente o crea uno nuevo)
+        let calidadFallo = false;
+        if (calidadDisponible && (calidadIdActual || hayCalidad)) {
+            try {
+                const url = calidadIdActual
+                    ? `${apiUrl()}/parametros_calidad/${calidadIdActual}`
+                    : `${apiUrl()}/parametros_calidad`;
+                const resp = await fetch(url, {
+                    method: calidadIdActual ? 'PUT' : 'POST',
+                    headers: cabeceras,
+                    body: JSON.stringify(calidadData)
+                });
+                if (!resp.ok) throw new Error('Error al guardar los parámetros de calidad');
+            } catch (error) {
+                console.error('Error al guardar parámetros de calidad:', error);
+                calidadFallo = true;
             }
         }
 
-        bindSlider("myRange", "valor");   // Profundidad
-        bindSlider("myRange1", "valor1"); // Diámetro perforación
-        bindSlider("myRange2", "valor2"); // Diámetro ADEME
-    });
+        Swal.fire({
+            icon: calidadFallo ? 'warning' : 'success',
+            title: calidadFallo ? 'Cambios guardados con observaciones' : '¡Pozo Actualizado!',
+            text: calidadFallo
+                ? 'Los datos del pozo se actualizaron, pero no se pudieron guardar los parámetros de calidad. Intenta de nuevo.'
+                : 'Los cambios se han guardado correctamente en la base de datos.',
+            confirmButtonColor: '#004982'
+        }).then(() => {
+            window.location.href = `Detalles_pozo.html?id=${idPozoActual}`;
+        });
+    }
   </script>
 
 </body>

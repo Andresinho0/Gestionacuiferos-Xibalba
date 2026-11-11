@@ -10,6 +10,31 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
+
+    <style>
+        /* Tarjeta de parámetros de calidad */
+        .calidad-seccion { margin-bottom: 22px; }
+        .calidad-seccion:last-child { margin-bottom: 0; }
+
+        .calidad-subtitulo {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+        }
+
+        .calidad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 0 25px;
+        }
+
+        .calidad-nota {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin: 0 0 18px 0;
+        }
+    </style>
 </head>
 <body>
 
@@ -50,7 +75,12 @@
             
             <div class="form-group">
                 <label for="ubicacion">Ubicación</label>
-                <input type="text" id="ubicacion" placeholder="Coordenadas o dirección">
+                <input type="text" id="ubicacion" placeholder="Coordenadas: Latitud / Longitud">
+            </div>
+
+            <div class="form-group">
+                <label for="altura">Altura (msnm)</label>
+                <input type="number" step="any" id="altura" placeholder="Ej. 2536">
             </div>
         </div>
 
@@ -142,6 +172,94 @@
             </div>
         </div>
 
+        <!-- TARJETA 4: Parámetros de calidad -->
+        <div class="tarjeta" style="grid-column: 1 / -1;">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-flask-vial"></i> 4. Parámetros de Calidad del Agua</h3>
+            <p class="calidad-nota">Opcional. Si no capturas ningún valor, el pozo se guarda sin parámetros de calidad.</p>
+
+            <div class="calidad-seccion">
+                <h4 class="calidad-subtitulo">Parámetros de campo</h4>
+                <div class="calidad-grid">
+                    <div class="form-group">
+                        <label for="cal-temperatura">Temperatura (°C)</label>
+                        <input type="number" step="any" id="cal-temperatura" placeholder="Ej. 27.29">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-ph">pH</label>
+                        <input type="number" step="any" id="cal-ph" placeholder="Ej. 7.34">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-ce">Conductividad eléctrica CE (µS/cm)</label>
+                        <input type="number" step="any" id="cal-ce" placeholder="Ej. 202">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-sdt">Sólidos disueltos totales SDT (ppm)</label>
+                        <input type="number" step="any" id="cal-sdt" placeholder="Ej. 101">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-eh">Potencial redox Eh (mV)</label>
+                        <input type="number" step="any" id="cal-eh" placeholder="Ej. 135">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-od-pct">Oxígeno disuelto OD (%)</label>
+                        <input type="number" step="any" id="cal-od-pct" placeholder="Ej. 55">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-od-mgl">Oxígeno disuelto OD (mg/L)</label>
+                        <input type="number" step="any" id="cal-od-mgl" placeholder="Ej. 3.4">
+                    </div>
+                </div>
+            </div>
+
+            <div class="calidad-seccion">
+                <h4 class="calidad-subtitulo">Química del agua</h4>
+                <div class="calidad-grid">
+                    <div class="form-group">
+                        <label for="cal-cloruros">Cloruros Cl⁻ (mg/L)</label>
+                        <input type="number" step="any" id="cal-cloruros" placeholder="Ej. 16.4">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-nitratos">Nitratos N-NO₃⁻ (mg/L)</label>
+                        <input type="text" id="cal-nitratos" placeholder="Ej. 0.31, 0.04* o N.D">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-sulfatos">Sulfatos SO₄²⁻ (mg/L)</label>
+                        <input type="number" step="any" id="cal-sulfatos" placeholder="Ej. 5">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-alcalinidad">Alcalinidad (mg CaCO₃/L)</label>
+                        <input type="number" step="any" id="cal-alcalinidad" placeholder="Ej. 81.2">
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-bicarbonatos">Bicarbonatos HCO₃⁻ (mg/L)</label>
+                        <input type="number" step="any" id="cal-bicarbonatos" placeholder="Ej. 98.85">
+                    </div>
+                </div>
+            </div>
+
+            <div class="calidad-seccion">
+                <h4 class="calidad-subtitulo">Microbiología</h4>
+                <div class="calidad-grid">
+                    <div class="form-group">
+                        <label for="cal-coliformes">Coliformes totales</label>
+                        <select id="cal-coliformes">
+                            <option value="">Sin dato</option>
+                            <option value="Negativo">Negativo</option>
+                            <option value="Positivo">Positivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cal-ecoli">E. coli</label>
+                        <select id="cal-ecoli">
+                            <option value="">Sin dato</option>
+                            <option value="Negativo">Negativo</option>
+                            <option value="Positivo">Positivo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
       </div> <!-- /.cards-grid -->
 
       <!-- Botones de Acción -->
@@ -182,6 +300,20 @@
     actualizarValorSlider('diametroPerforacion', 'valorDiametroPerforacion');
     actualizarValorSlider('diametroADEME', 'valorDiametroADEME');
 
+    // Lee un input numérico: vacío -> null, si no el número
+    function valorNumero(id) {
+        const v = document.getElementById(id).value.trim();
+        if (v === '') return null;
+        const n = Number(v);
+        return isNaN(n) ? null : n;
+    }
+
+    // Lee un input de texto o select: vacío -> null
+    function valorTexto(id) {
+        const v = document.getElementById(id).value.trim();
+        return v === '' ? null : v;
+    }
+
     // Función principal para guardar
     function guardarPozo() {
         const clavePozo = document.getElementById('clavePozo').value.trim();
@@ -196,12 +328,14 @@
             return;
         }
 
-        // Crear el objeto con TODOS los campos de las 3 tarjetas
+        // Crear el objeto con los campos de las tarjetas 1 a 3 (lista_pozos)
         const pozoData = {
             l_poz_clave: clavePozo,
             lp_Nombre: nombrePozo,
             lp_ramal: document.getElementById('ramal').value.trim(),
-            lp_ubicación: document.getElementById('ubicacion').value.trim(),
+            // Sin acento: así se llama la propiedad en la entidad (getLp_ubicacion)
+            lp_ubicacion: document.getElementById('ubicacion').value.trim(),
+            lp_altura: document.getElementById('altura').value.trim() || null,
             
             lp_Profundidad_perforación: parseInt(document.getElementById('profundidad').value),
             lp_Diámetro_perforación: parseInt(document.getElementById('diametroPerforacion').value),
@@ -217,6 +351,36 @@
             lp_utr: document.getElementById('utr').value
         };
 
+        // Validación de los parámetros de calidad (todos opcionales)
+        const phValor = valorNumero('cal-ph');
+        if (phValor !== null && (phValor < 0 || phValor > 14)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'pH fuera de rango',
+                text: 'El pH debe estar entre 0 y 14.',
+            });
+            return;
+        }
+
+        const calidadData = {
+            temperaturaC:        valorNumero('cal-temperatura'),
+            ph:                  phValor,
+            ceUsCm:              valorNumero('cal-ce'),
+            sdtPpm:              valorNumero('cal-sdt'),
+            ehMv:                valorNumero('cal-eh'),
+            odPorcentaje:        valorNumero('cal-od-pct'),
+            odMgL:               valorNumero('cal-od-mgl'),
+            clorurosMgL:         valorNumero('cal-cloruros'),
+            nitratosMgL:         valorTexto('cal-nitratos'),   // texto: admite "0.04*" y "N.D"
+            sulfatosMgL:         valorNumero('cal-sulfatos'),
+            alcalinidadMgCaco3L: valorNumero('cal-alcalinidad'),
+            bicarbonatosMgL:     valorNumero('cal-bicarbonatos'),
+            coliformesTotales:   valorTexto('cal-coliformes'),
+            // Lombok genera getEColi()/setEColi(), que Jackson expone como "ecoli" (todo en minúsculas)
+            ecoli:               valorTexto('cal-ecoli')
+        };
+        const hayCalidad = Object.values(calidadData).some(v => v !== null);
+
         // Enviar los datos usando la variable global de script.js (o fallback a localhost si prefieres)
         const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
 
@@ -231,11 +395,32 @@
             if(!response.ok) throw new Error("Error al guardar en el servidor");
             return response.json();
         })
-        .then(data => {
+        .then(pozo => {
+            // Paso 2: guardar los parámetros de calidad ligados al pozo recién creado
+            if (!hayCalidad) return 'sin-calidad';
+
+            const pozoId = pozo && pozo.id_lp;
+            if (!pozoId) return 'sin-id';
+
+            return fetch(`${baseUrl}/parametros_calidad`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ...calidadData, pozoId: pozoId })
+            })
+            .then(resp => resp.ok ? 'ok' : 'error')
+            .catch(() => 'error');
+        })
+        .then(resultadoCalidad => {
+            const calidadFallo = resultadoCalidad === 'error' || resultadoCalidad === 'sin-id';
+
             Swal.fire({
-                icon: 'success',
-                title: '¡Pozo Registrado!',
-                text: 'El nuevo pozo se ha guardado correctamente en la base de datos.',
+                icon: calidadFallo ? 'warning' : 'success',
+                title: calidadFallo ? 'Pozo registrado con observaciones' : '¡Pozo Registrado!',
+                text: calidadFallo
+                    ? 'El pozo se guardó, pero no se pudieron guardar sus parámetros de calidad. Puedes volver a capturarlos después.'
+                    : 'El nuevo pozo se ha guardado correctamente en la base de datos.',
                 confirmButtonColor: '#004982'
             }).then(() => {
                 document.location = 'Listado_pozos.html';

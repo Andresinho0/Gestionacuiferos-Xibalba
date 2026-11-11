@@ -97,6 +97,67 @@
             text-align: center;
             color: #64748b;
         }
+
+        /* Tarjeta de Parámetros de Calidad */
+        .calidad-muestra + .calidad-muestra {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .calidad-muestra-titulo {
+            color: #004982;
+            font-size: 1rem;
+            margin: 0 0 14px 0;
+        }
+
+        .calidad-seccion {
+            margin-bottom: 22px;
+        }
+
+        .calidad-seccion:last-child {
+            margin-bottom: 0;
+        }
+
+        .calidad-subtitulo {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+        }
+
+        .calidad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 14px 25px;
+        }
+
+        .param-item {
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .sin-dato {
+            color: #94a3b8;
+        }
+
+        .badge-resultado {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .badge-positivo { background: #fee2e2; color: #b91c1c; }
+        .badge-negativo { background: #dcfce7; color: #15803d; }
+
+        #calidad-aviso {
+            display: none;
+            padding: 30px 10px;
+            text-align: center;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -139,6 +200,11 @@
             <div class="detail-group">
                 <span class="detail-label">Ubicación / Coordenadas</span>
                 <span class="detail-value" id="det-ubicacion">Cargando...</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Altura</span>
+                <span class="detail-value" id="det-altura">Cargando...</span>
             </div>
         </div>
 
@@ -218,6 +284,15 @@
             </a>
         </div>
 
+        <!-- TARJETA 5: Parámetros de calidad -->
+        <div class="tarjeta" style="grid-column: 1 / -1;">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-flask-vial"></i> 5. Parámetros de Calidad del Agua</h3>
+            <div id="calidad-contenido"><span class="detail-value">Cargando...</span></div>
+            <div id="calidad-aviso">
+                <i class="fa-solid fa-flask"></i> <span id="calidad-aviso-texto">Este pozo no tiene parámetros de calidad registrados.</span>
+            </div>
+        </div>
+
       </div> <!-- /.cards-grid -->
 
       <!-- Botones de Acción -->
@@ -272,6 +347,9 @@
             return;
         }
 
+        // Parámetros de calidad (tarjeta 5): se carga aparte para que un fallo aquí no afecte al resto de la ficha
+        cargarParametrosCalidad(idPozo);
+
         // 2. Consultar la API de Spring Boot
         fetch(`${API_BASE_URL}/lista_pozos/${idPozo}`)
             .then(response => {
@@ -284,6 +362,7 @@
                 document.getElementById('det-nombre').textContent = data.lp_Nombre || 'Sin registro';
                 document.getElementById('det-ramal').textContent = data.lp_ramal || 'No asignado';
                 document.getElementById('det-ubicacion').textContent = data.lp_ubicacion || 'No especificada';
+                document.getElementById('det-altura').textContent = formatearAltura(data.lp_altura);
                 // Tarjeta 2
                 document.getElementById('det-profundidad').textContent = data.lp_Profundidad_perforación || '0';
                 document.getElementById('det-diam-perf').textContent = data.lp_Diámetro_perforación || '0';
@@ -311,6 +390,149 @@
                 });
             });
     });
+
+
+    // ==========================================
+    // ALTURA
+    // ==========================================
+
+    // Si es un número puro (ej. "2536") le agrega la unidad; si ya trae texto lo deja tal cual
+    function formatearAltura(valor) {
+        if (valor === null || valor === undefined || String(valor).trim() === '') return 'No especificada';
+        const texto = String(valor).trim();
+        return /^\d+(\.\d+)?$/.test(texto) ? `${texto} msnm` : texto;
+    }
+
+    // ==========================================
+    // PARÁMETROS DE CALIDAD
+    // ==========================================
+
+    const PARAMETROS_CALIDAD = [
+        {
+            grupo: 'Parámetros de campo',
+            campos: [
+                { claves: ['temperaturaC'],   label: 'Temperatura',                     unidad: '°C' },
+                { claves: ['ph'],             label: 'pH' },
+                { claves: ['ceUsCm'],         label: 'Conductividad eléctrica (CE)',    unidad: 'µS/cm' },
+                { claves: ['sdtPpm'],         label: 'Sólidos disueltos totales (SDT)', unidad: 'ppm' },
+                { claves: ['ehMv'],           label: 'Potencial redox (Eh)',            unidad: 'mV' },
+                { claves: ['odPorcentaje'],   label: 'Oxígeno disuelto (saturación)',   unidad: '%' },
+                { claves: ['odMgL'],          label: 'Oxígeno disuelto (OD)',           unidad: 'mg/L' }
+            ]
+        },
+        {
+            grupo: 'Química del agua',
+            campos: [
+                { claves: ['clorurosMgL'],         label: 'Cloruros (Cl⁻)',        unidad: 'mg/L' },
+                { claves: ['nitratosMgL'],         label: 'Nitratos (N-NO₃⁻)',     unidad: 'mg/L' },
+                { claves: ['sulfatosMgL'],         label: 'Sulfatos (SO₄²⁻)',      unidad: 'mg/L' },
+                { claves: ['alcalinidadMgCaco3L'], label: 'Alcalinidad',           unidad: 'mg CaCO₃/L' },
+                { claves: ['bicarbonatosMgL'],     label: 'Bicarbonatos (HCO₃⁻)',  unidad: 'mg/L' }
+            ]
+        },
+        {
+            grupo: 'Microbiología',
+            campos: [
+                { claves: ['coliformesTotales'],   label: 'Coliformes totales', badge: true },
+                // Lombok genera getEColi(), que Jackson puede serializar como "ecoli" en vez de "eColi"
+                { claves: ['eColi', 'ecoli'],      label: 'E. coli',            badge: true }
+            ]
+        }
+    ];
+
+    function crearElemento(etiqueta, clase, texto) {
+        const el = document.createElement(etiqueta);
+        if (clase) el.className = clase;
+        if (texto !== undefined) el.textContent = texto;
+        return el;
+    }
+
+    function leerValor(registro, claves) {
+        for (const k of claves) {
+            if (registro[k] !== null && registro[k] !== undefined && String(registro[k]).trim() !== '') {
+                return registro[k];
+            }
+        }
+        return null;
+    }
+
+    function crearCampoCalidad(campo, registro) {
+        const item = crearElemento('div', 'param-item');
+        item.appendChild(crearElemento('span', 'detail-label', campo.label));
+
+        const contenedor = crearElemento('span', 'detail-value');
+        const valor = leerValor(registro, campo.claves);
+
+        if (valor === null) {
+            contenedor.appendChild(crearElemento('span', 'sin-dato', 'Sin dato'));
+        } else if (campo.badge) {
+            const texto = String(valor).trim();
+            const clase = /^pos/i.test(texto) ? 'badge-positivo' : (/^neg/i.test(texto) ? 'badge-negativo' : '');
+            contenedor.appendChild(crearElemento('span', 'badge-resultado ' + clase, texto));
+        } else {
+            // Números a máximo 2 decimales; textos como "0.04*" o "N.D" se muestran tal cual
+            const texto = typeof valor === 'number' ? String(Math.round(valor * 100) / 100) : String(valor).trim();
+            contenedor.appendChild(crearElemento('span', 'highlight-value', texto));
+            // La unidad solo tiene sentido si el valor empieza con un número (no con "N.D")
+            if (campo.unidad && /^\d/.test(texto)) {
+                contenedor.appendChild(document.createTextNode(' ' + campo.unidad));
+            }
+        }
+
+        item.appendChild(contenedor);
+        return item;
+    }
+
+    function crearMuestraCalidad(registro, titulo) {
+        const muestra = crearElemento('div', 'calidad-muestra');
+        if (titulo) muestra.appendChild(crearElemento('h4', 'calidad-muestra-titulo', titulo));
+
+        PARAMETROS_CALIDAD.forEach(grupo => {
+            const seccion = crearElemento('div', 'calidad-seccion');
+            seccion.appendChild(crearElemento('h4', 'calidad-subtitulo', grupo.grupo));
+
+            const grid = crearElemento('div', 'calidad-grid');
+            grupo.campos.forEach(campo => grid.appendChild(crearCampoCalidad(campo, registro)));
+
+            seccion.appendChild(grid);
+            muestra.appendChild(seccion);
+        });
+
+        return muestra;
+    }
+
+    function mostrarAvisoCalidad(mensaje) {
+        document.getElementById('calidad-contenido').style.display = 'none';
+        document.getElementById('calidad-aviso-texto').textContent = mensaje;
+        document.getElementById('calidad-aviso').style.display = 'block';
+    }
+
+    function cargarParametrosCalidad(id) {
+        const contenedor = document.getElementById('calidad-contenido');
+
+        fetch(`${API_BASE_URL}/parametros_calidad/pozo/${id}`)
+            .then(response => {
+                if (!response.ok) throw new Error('No se pudieron cargar los parámetros de calidad.');
+                return response.json();
+            })
+            .then(registros => {
+                if (!Array.isArray(registros) || registros.length === 0) {
+                    mostrarAvisoCalidad('Este pozo no tiene parámetros de calidad registrados.');
+                    return;
+                }
+
+                contenedor.textContent = '';
+                registros.forEach((registro, i) => {
+                    // Solo se numeran las muestras si hay más de una
+                    const titulo = registros.length > 1 ? `Muestra ${i + 1}` : null;
+                    contenedor.appendChild(crearMuestraCalidad(registro, titulo));
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAvisoCalidad('No se pudieron cargar los parámetros de calidad.');
+            });
+    }
 
 
     function descargarReportePDF() {
