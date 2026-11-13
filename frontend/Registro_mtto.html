@@ -37,7 +37,12 @@
                 <label for="clavePozo">Clave del Pozo</label>
                 <input type="text" id="clavePozo" placeholder="Ej. LN-138" required>
             </div>
-            
+
+            <div class="form-group">
+                <label for="fechaCaptura">Fecha de Captura</label>
+                <input type="datetime-local" id="fechaCaptura">
+            </div>
+
             <div class="form-group">
                 <label for="motorTipo">Tipo de Motor</label>
                 <select id="motorTipo">
@@ -50,19 +55,41 @@
             <!-- Sliders de Potencia -->
             <div class="slider-container">
                 <label for="motorHp">Potencia (HP):</label>
-                <input type="range" min="30" max="150" value="30" class="slider" id="motorHp">
-                <div class="slider-value">Valor seleccionado: <b id="val_motorHp" style="color: #004982;">30</b> HP</div>
+                <input type="range" min="0" max="150" value="0" class="slider" id="motorHp">
+                <div class="slider-value">Valor seleccionado: <b id="val_motorHp" style="color: #004982;">0</b> HP</div>
             </div>
 
             <div class="slider-container">
                 <label for="motorKw">Potencia (KW):</label>
-                <input type="range" min="30" max="150" value="30" class="slider" id="motorKw">
-                <div class="slider-value">Valor seleccionado: <b id="val_motorKw" style="color: #004982;">30</b> KW</div>
+                <input type="range" min="0" max="150" value="0" class="slider" id="motorKw">
+                <div class="slider-value">Valor seleccionado: <b id="val_motorKw" style="color: #004982;">0</b> KW</div>
             </div>
-            
+
             <div class="form-group">
                 <label for="motorEficiencia">Eficiencia del Motor (%)</label>
-                <input type="number" step="1" id="motorEficiencia" placeholder="Ej. 95">
+                <input type="number" step="0.01" min="0" max="100" id="motorEficiencia" placeholder="Ej. 95.5">
+            </div>
+
+            <div class="form-group" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+                <label style="color:#004982;">Bomba</label>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label for="bombaMarca">Marca</label>
+                    <input type="text" id="bombaMarca" placeholder="Ej. Grundfos">
+                </div>
+                <div class="grid-2-col">
+                    <div class="form-group">
+                        <label for="bombaLps">Gasto (L/s)</label>
+                        <input type="number" step="0.01" min="0" id="bombaLps" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="bombaRpm">Revoluciones (RPM)</label>
+                        <input type="number" step="1" min="0" id="bombaRpm" placeholder="Ej. 1760">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bombaHp">Potencia (Hp)</label>
+                    <input type="number" step="0.01" min="0" id="bombaHp" placeholder="Ej. 75">
+                </div>
             </div>
         </div>
 
@@ -80,6 +107,22 @@
                 </select>
             </div>
 
+            <div class="form-group">
+                <label for="tableroMarca">Marca del Tablero</label>
+                <input type="text" id="tableroMarca" placeholder="Ej. Schneider">
+            </div>
+
+            <div class="grid-2-col">
+                <div class="form-group">
+                    <label for="tableroHp">Capacidad (Hp)</label>
+                    <input type="number" step="0.01" min="0" id="tableroHp" placeholder="Ej. 75">
+                </div>
+                <div class="form-group">
+                    <label for="tableroVoltaje">Voltaje (V)</label>
+                    <input type="number" step="1" min="0" id="tableroVoltaje" placeholder="Ej. 440">
+                </div>
+            </div>
+
             <!-- Slider de Capacidad del Tablero -->
             <div class="slider-container">
                 <label for="tableroCap">Capacidad del Tablero (A):</label>
@@ -87,10 +130,20 @@
                 <div class="slider-value">Valor seleccionado: <b id="val_tableroCap" style="color: #004982;">50</b> A</div>
             </div>
 
+            <div class="form-group">
+                <label for="transSeco">Transformador Seco</label>
+                <select id="transSeco">
+                    <option value="">Seleccione opción</option>
+                    <option value="Elevado">Elevado</option>
+                    <option value="Pedestal">Pedestal</option>
+                </select>
+            </div>
+
+            <label style="color:#004982; font-weight: bold;">Transformador</label>
             <div class="grid-2-col">
                 <div class="form-group">
-                    <label for="transTipo">Transformador</label>
-                    <input type="text" id="transTipo" placeholder="Ej. Elevado">
+                    <label for="transMarca">Marca</label>
+                    <input type="text" id="transMarca" placeholder="Ej. Prolec">
                 </div>
                 <div class="form-group">
                     <label for="transCap">Capacidad (kVA)</label>
@@ -127,15 +180,6 @@
                     <option value="Si">Sí</option>
                 </select>
             </div>
-
-            <div class="form-group">
-                <label for="transSeco">Transformador Seco</label>
-                <select id="transSeco">
-                    <option value="">Seleccione opción</option>
-                    <option value="Elevado">Elevado</option>
-                    <option value="Pedestal">Pedestal</option>
-                </select>
-            </div>
         </div>
 
         <!-- TARJETA 3: Tubería y Medidores -->
@@ -163,14 +207,14 @@
 
             <!-- Slider Presión -->
             <div class="slider-container">
-                <label for="medidorPresion">Presión:</label>
+                <label for="medidorPresion">Presión (kg/cm²):</label>
                 <input type="range" min="0" max="10" step="0.01" value="0" class="slider" id="medidorPresion">
-                <div class="slider-value">Valor seleccionado: <b id="val_medidorPresion" style="color: #004982;">0</b></div>
+                <div class="slider-value">Valor seleccionado: <b id="val_medidorPresion" style="color: #004982;">0</b> kg/cm²</div>
             </div>
 
             <div class="form-group">
-                <label for="medidorFlujo">Flujo</label>
-                <input type="number" step="0.01" id="medidorFlujo" placeholder="0.00">
+                <label for="medidorFlujo">Flujo (L/s)</label>
+                <input type="number" step="0.01" min="0" id="medidorFlujo" placeholder="0.00">
             </div>
 
             <div class="grid-2-col">
@@ -215,35 +259,50 @@
             <div class="form-group" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
                 <label style="color:#004982;">Cable Transformador - Arrancador</label>
                 <div class="grid-2-col" style="margin-top: 10px;">
-                    <select id="cableTrans" class="form-group">
-                        <option value="">Seleccione material</option>
-                        <option value="Aluminio">Aluminio</option>
-                        <option value="Cobre">Cobre</option>
-                    </select>
-                    <select id="calibreArrancador" class="form-group">
-                        <option value="">Seleccione calibre</option>
-                        <option value="0">0</option>
-                        <option value="00">00</option>
-                        <option value="000">000</option>
-                    </select>
+                    <div class="form-group">
+                        <label for="cableTrans">Material</label>
+                        <select id="cableTrans">
+                            <option value="">Seleccione material</option>
+                            <option value="Aluminio">Aluminio</option>
+                            <option value="Cobre">Cobre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="calibreArrancador">Calibre</label>
+                        <select id="calibreArrancador">
+                            <option value="">Seleccione calibre</option>
+                            <option value="0">0</option>
+                            <option value="00">00</option>
+                            <option value="000">000</option>
+                        </select>
+                    </div>
                 </div>
-                <input type="number" step="0.01" id="longitudArrancador" placeholder="Longitud (m)" style="width: 100%; margin-top: 5px;">
+                <div class="form-group">
+                    <label for="longitudArrancador">Longitud (m)</label>
+                    <input type="number" step="0.01" min="0" id="longitudArrancador" placeholder="Ej. 12.5" style="width: 100%;">
+                </div>
             </div>
 
             <div class="form-group" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
                 <label style="color:#004982;">Cable Arrancador - Bomba</label>
                 <div class="grid-2-col" style="margin-top: 10px;">
-                    <select id="cableBomba" class="form-group">
-                        <option value="">Seleccione material</option>
-                        <option value="Aluminio">Aluminio</option>
-                        <option value="Cobre">Cobre</option>
-                    </select>
-                    <select id="calibreBomba" class="form-group">
-                        <option value="">Seleccione calibre</option>
-                        <option value="0">0</option>
-                        <option value="00">00</option>
-                        <option value="000">000</option>
-                    </select>
+                    <div class="form-group">
+                        <label for="cableBomba">Material</label>
+                        <select id="cableBomba">
+                            <option value="">Seleccione material</option>
+                            <option value="Aluminio">Aluminio</option>
+                            <option value="Cobre">Cobre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="calibreBomba">Calibre</label>
+                        <select id="calibreBomba">
+                            <option value="">Seleccione calibre</option>
+                            <option value="0">0</option>
+                            <option value="00">00</option>
+                            <option value="000">000</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- Slider Longitud Cable Arrancador - Bomba -->
@@ -308,6 +367,12 @@
         sincronizarSlider("longitudTuberia", "val_longitudTuberia");
         sincronizarSlider("medidorPresion", "val_medidorPresion");
         sincronizarSlider("longitudBomba", "val_longitudBomba");
+
+        // Fecha de captura: por defecto ahora, sin permitir fechas futuras
+        const fecha = document.getElementById('fechaCaptura');
+        const ahora = fechaLocalISO().slice(0, 16);
+        fecha.value = ahora;
+        fecha.max = ahora;
     });
 
     // Fecha local sin zona horaria ("2026-09-28T12:30:00") para LocalDateTime
@@ -315,6 +380,12 @@
         const date = new Date();
         const p = n => String(n).padStart(2, '0');
         return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}:${p(date.getSeconds())}`;
+    }
+
+    // Toma la fecha elegida ("2026-09-28T12:30") y la completa con segundos
+    function fechaCapturaISO() {
+        const f = val('fechaCaptura');
+        return f ? (f.length === 16 ? `${f}:00` : f) : fechaLocalISO();
     }
 
     function guardarMantenimiento() {
@@ -329,17 +400,45 @@
             return;
         }
 
+        const eficiencia = decimal('motorEficiencia');
+        if (eficiencia !== null && (eficiencia < 0 || eficiencia > 100)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Valor no válido',
+                text: 'La eficiencia del motor debe estar entre 0 y 100 %.'
+            });
+            return;
+        }
+
+        const fechaCaptura = fechaCapturaISO();
+        if (fechaCaptura > fechaLocalISO()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Fecha no válida',
+                text: 'La fecha de captura no puede ser futura.'
+            });
+            return;
+        }
+
         // Construir el objeto con los nombres exactos del backend
         const mantenimientoData = {
             mtto_clave_pozo: clavePozo,
             mtto_motor_tipo: val('motorTipo'),
             mtto_motor_hp: entero('motorHp'),
             mtto_motor_kw: entero('motorKw'),
-            mtto_motor_eficiencia: entero('motorEficiencia'),
+            mtto_motor_eficiencia: eficiencia,
+
+            mtto_bomba_marca: txt('bombaMarca'),
+            mtto_bomba_lps: decimal('bombaLps'),
+            mtto_bomba_rpm: entero('bombaRpm'),
+            mtto_bomba_hp: decimal('bombaHp'),
 
             mtto_tablero_tipo: val('tableroTipo'),
+            mtto_tablero_marca: txt('tableroMarca'),
+            mtto_tablero_hp: decimal('tableroHp'),
+            mtto_tablero_voltaje: entero('tableroVoltaje'),
             mtto_tablero_capacidad: entero('tableroCap'),
-            mtto_transformador_tipo: txt('transTipo'),
+            mtto_transformador_marca: txt('transMarca'),
             mtto_transformador_capacidad: entero('transCap'),
 
             mtto_panel_solar: val('panelSolar'),
@@ -368,7 +467,7 @@
 
             // --- CAMPOS DE CONTROL --- //
             mtto_operador: 1, // ID temporal, luego lo podemos ligar al localStorage
-            mtto_fecha_captura: fechaLocalISO() // Sin "Z", compatible con LocalDateTime
+            mtto_fecha_captura: fechaCaptura // Sin "Z", compatible con LocalDateTime
         };
 
         const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';

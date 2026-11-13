@@ -1178,3 +1178,28 @@ footer small {
     color: #004982;
     font-weight: bold;
 }
+/* Tarjeta de parámetros de calidad (Nuevo_pozo / Modificar_pozo) */
+.calidad-seccion { margin-bottom: 22px; }
+.calidad-seccion:last-child { margin-bottom: 0; }
+
+.calidad-subtitulo {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+}
+
+.calidad-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 0 25px;
+}
+
+/* Etiquetas de distinta longitud: el input siempre queda alineado abajo */
+.calidad-grid .form-group label { flex: 1; }
+
+.calidad-nota {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin: 0 0 18px 0;
+}

@@ -177,7 +177,7 @@
     
     <div class="panel-header">
       <h2>Listado Detallado</h2>
-      <a href="Nuevo_pozo.html" class="add-btn">
+      <a href="Registro_mtto.html" class="add-btn">
         <i class="fa-regular fa-square-plus"></i> Agregar mantenimiento
       </a>
     </div>
@@ -245,13 +245,16 @@
                                       <div class="detail-group"><span class="detail-label">Tipo</span><span class="detail-value">${item.mtto_motor_tipo || '-'}</span></div>
                                       <div class="detail-group"><span class="detail-label">Potencia (HP / KW)</span><span class="detail-value">${item.mtto_motor_hp || '0'} HP / ${item.mtto_motor_kw || '0'} KW</span></div>
                                       <div class="detail-group"><span class="detail-label">Eficiencia</span><span class="detail-value">${item.mtto_motor_eficiencia || '0'}%</span></div>
+                                      <div class="detail-group"><span class="detail-label">Bomba (Marca)</span><span class="detail-value">${item.mtto_bomba_marca || '-'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Bomba (Gasto / RPM / HP)</span><span class="detail-value">${item.mtto_bomba_lps ?? '-'} L/s / ${item.mtto_bomba_rpm ?? '-'} RPM / ${item.mtto_bomba_hp ?? '-'} HP</span></div>
                                   </div>
 
                                   <!-- TARJETA 2: Equipamiento Eléctrico -->
                                   <div class="tarjeta">
                                       <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
                                       <div class="detail-group"><span class="detail-label">Tablero (Tipo / Cap.)</span><span class="detail-value">${item.mtto_tablero_tipo || '-'} / ${item.mtto_tablero_capacidad || '0'} A</span></div>
-                                      <div class="detail-group"><span class="detail-label">Transformador (Tipo / Cap.)</span><span class="detail-value">${item.mtto_transformador_tipo || '-'} / ${item.mtto_transformador_capacidad || '0'} kVA</span></div>
+                                      <div class="detail-group"><span class="detail-label">Tablero (Marca / HP / Voltaje)</span><span class="detail-value">${item.mtto_tablero_marca || '-'} / ${item.mtto_tablero_hp ?? '-'} HP / ${item.mtto_tablero_voltaje ?? '-'} V</span></div>
+                                      <div class="detail-group"><span class="detail-label">Transformador (Marca / Cap.)</span><span class="detail-value">${item.mtto_transformador_marca || item.mtto_transformador_tipo || '-'} / ${item.mtto_transformador_capacidad || '0'} kVA</span></div>
                                       <div class="detail-group"><span class="detail-label">Transformador Seco</span><span class="detail-value">${item.mtto_trans_seco || '-'}</span></div>
                                       <div class="detail-group"><span class="detail-label">Panel Solar / Baterías</span><span class="detail-value">${item.mtto_panel_solar || '-'} / ${item.mtto_banco_baterias || '-'}</span></div>
                                       <div class="detail-group"><span class="detail-label">Sistema de Tierras</span><span class="detail-value">${item.mtto_sistema_tierras || '-'}</span></div>
@@ -260,8 +263,8 @@
                                   <!-- TARJETA 3: Medidores y Tubería -->
                                   <div class="tarjeta">
                                       <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Medidores y Tubería</h3>
-                                      <div class="detail-group"><span class="detail-label">Medidores (Presión / Flujo)</span><span class="detail-value">${item.mtto_medidor_presion || '0'} / ${item.mtto_medidor_flujo || '0'}</span></div>
-                                      <div class="detail-group"><span class="detail-label">Medidores N.E. / N.D.</span><span class="detail-value">${item.mtto_medidor_NE || '-'} / ${item.mtt_medidor_ND || '-'}</span></div>
+                                      <div class="detail-group"><span class="detail-label">Medidores (Presión / Flujo)</span><span class="detail-value">${item.mtto_medidor_presion || '0'} kg/cm² / ${item.mtto_medidor_flujo || '0'} L/s</span></div>
+                                      <div class="detail-group"><span class="detail-label">Medidores N.E. / N.D.</span><span class="detail-value">${item.mtto_medidor_NE || '-'} / ${item.mtto_medidor_ND || '-'}</span></div>
                                       <div class="detail-group"><span class="detail-label">Tubería (Diámetro / Longitud)</span><span class="detail-value">${item.mtto_tuberia_diametro || '0'} in / ${item.mtto_tuberia_longitud || '0'} m</span></div>
                                       <div class="detail-group"><span class="detail-label">Poliducto / Sanitaria</span><span class="detail-value">${item.mtto_poliducto || '-'} / ${item.mtto_sanitaria || '-'}</span></div>
                                   </div>
