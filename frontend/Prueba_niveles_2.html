@@ -22,7 +22,8 @@
         .interpretacion { margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.95); border-radius: 6px; display: none; white-space: pre-wrap; border: 1px solid #ccc; color: #004982; font-size: 0.95rem; line-height: 1.5; }
         .help-icon { cursor: pointer; margin-left: 6px; color: #ffffff; background: #004982; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.5); transition: transform 0.2s ease; }
         .help-icon:hover { transform: scale(1.1); }
-        .input-styled { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); font-family: inherit; color: #004982; outline: none; background-color: rgba(255, 255, 255, 0.95); }
+        .input-styled { width: 100%; box-sizing: border-box; min-width: 0; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); font-family: inherit; color: #004982; outline: none; background-color: rgba(255, 255, 255, 0.95); }
+        .form-group { min-width: 0; }
         .input-styled:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
@@ -31,32 +32,7 @@
 <div class="page-content">
 
   <!-- Header Estandarizado -->
-    <header class="main-header">
-      <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
-        <img src="img/iitca_logo.png" class="logo-img">
-      </a>
-
-      <div class="header-actions">
-        <!-- Notificaciones estilizadas como botón -->
-        <div class="notification-container">
-          <button type="button" class="nav-btn notification-btn" onclick="toggleNotifications()">
-            <i class="fa-solid fa-bell"></i>
-          </button>
-
-          <!-- Buzón de notificaciones -->
-          <div class="notification-dropdown" id="notificationDropdown">
-            <div class="notification-item">Nueva notificación 1</div>
-            <div class="notification-item">Nueva notificación 2</div>
-            <div class="notification-item">Nueva notificación 3</div>
-          </div>
-        </div>
-
-        <a href="index.html" class="nav-btn logout-link">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          Cerrar Sesión
-        </a>
-      </div>
-    </header>
+  <div id="header-container"></div>
 
   <h1 class="main-title"><i class="fa-solid fa-water"></i> Niveles y Caudal Específico</h1>
 
@@ -260,7 +236,7 @@
   </small>
 </footer>
 
-<!-- JS ORIGINAL (Mantiene toda tu lógica funcional intacta) -->
+
 <script type="module">
 /* ============================
    UTILIDADES
@@ -270,7 +246,19 @@ function mean(arr){ if(!arr.length) return null; return arr.reduce((a,b)=>a+b,0)
 function variance(arr){ if(!arr.length) return null; const m=mean(arr); return arr.reduce((s,x)=>s+Math.pow(x-m,2),0)/arr.length; }
 function stddev(arr){ const v=variance(arr); return v==null?null:Math.sqrt(v); }
 function percentile(arr,p){ if(!arr.length) return null; const s=[...arr].sort((a,b)=>a-b); const idx=(p/100)*(s.length-1); if(Number.isInteger(idx)) return s[idx]; const lo=Math.floor(idx), hi=Math.ceil(idx), frac=idx-lo; return s[lo] + (s[hi]-s[lo])*frac; }
+// Recorta a YYYY-MM-DD sin pasar por Date (evita corrimientos por zona horaria)
+function toISODate(s){ const m = /^\d{4}-\d{2}-\d{2}/.exec(String(s ?? '')); return m ? m[0] : null; }
 function debounce(fn,wait=200){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
+
+function normalizeRegistro(r, fallbackLabel){
+  return {
+    fecha: toISODate(r.op_fecha_captura || r.fecha || r.fechaIso || r.fechaOperacion),
+    ne: safeParseFloat(r.op_nestatico ?? r.nivelEstatico ?? r.ne ?? null),
+    di: safeParseFloat(r.op_ndinamico ?? r.op_dinamico ??r.nivelDinamico ?? r.di ?? null),
+    gasto: safeParseFloat(r.op_gasto ?? r.caudal ?? r.gasto ?? null),
+    cve: r.op_cpozo || r.clavePozo || r.cvePozo || fallbackLabel || ''
+  };
+}
 
 /* ============================
    ESTADO
@@ -281,45 +269,63 @@ let chartNiveles = null;
 let chartSpecific = null;
 
 /* ============================
-   POBLAR SELECT POZOS (4 POZOS)
+   POBLAR SELECT POZOS (API)
    ============================ */
-const pozosSim = [
-  { id: '1', clave: 'PZ-01', nombre: 'Pozo Norte' },
-  { id: '2', clave: 'PZ-02', nombre: 'Pozo Este' },
-  { id: '3', clave: 'PZ-03', nombre: 'Pozo Sur' },
-  { id: '4', clave: 'PZ-04', nombre: 'Pozo Oeste' }
-];
-
-function poblarPozosSelect(){
+async function poblarPozosSelect(){
   const sel = document.getElementById('pozosSelect');
   sel.innerHTML = '';
-  pozosSim.forEach(p=>{
-    const opt = document.createElement('option');
-    opt.value = p.id;
-    opt.textContent = `${p.clave} — ${p.nombre}`;
-    sel.appendChild(opt);
-  });
+  try {
+    const res = await fetch(`${API_BASE_URL}/lista_pozos`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    data.forEach(p=>{
+      if(!p.l_poz_clave) return;
+      const opt = document.createElement('option');
+      opt.value = p.l_poz_clave;
+      opt.textContent = p.lp_Nombre ? `${p.l_poz_clave} — ${p.lp_Nombre}` : p.l_poz_clave;
+      sel.appendChild(opt);
+    });
+  } catch(e){
+    console.error('No se pudo cargar la lista de pozos', e);
+    Swal.fire('Error','No se pudo cargar la lista de pozos','error');
+  }
 }
 
 /* ============================
-   DATOS SIMULADOS
+   CARGAR REGISTROS DE OPERACIÓN (API)
+   El backend no filtra por pozo, así que se pide todo y se filtra por clave.
    ============================ */
-function generarSimuladosPara(pozoLabel){
-  const out=[];
-  const meses = 24; 
-  const hoy = new Date();
-  const base = 60 + Math.random()*10;      
-  const aumentoMensual = 0.7 + Math.random()*0.6; 
-  for(let i=meses-1;i>=0;i--){
-    const d = new Date(hoy.getFullYear(), hoy.getMonth()-i, 15); 
-    const month = d.getMonth(); 
-    const lluvia = [4,5,6,7].includes(month) ? (-2 - Math.random()*2) : 0; 
-    const ne = base + ((meses-1 - i) * aumentoMensual) + lluvia + (Math.random()*1.2 - 0.6);
-    const di = ne - (1.5 + Math.random()*1.2); 
-    const q = 12 + Math.random()*8; 
-    out.push({ fecha: d.toISOString().slice(0,10), ne: Number(ne.toFixed(2)), di: Number(di.toFixed(2)), gasto: Number(q.toFixed(2)), cve: pozoLabel });
+async function cargarRegistrosSeleccionados(){
+  const sel = document.getElementById('pozosSelect');
+  const selected = Array.from(sel.selectedOptions).map(o=> ({ id:o.value, label:o.textContent }));
+  if(selected.length===0){ Swal.fire('Aviso','Seleccione al menos un pozo','warning'); return; }
+  let datos;
+  try {
+    const res = await fetch(`${API_BASE_URL}/operacion`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    datos = await res.json();
+  } catch(e){
+    console.error('No se pudieron cargar los registros de operación', e);
+    Swal.fire('Error','No se pudieron cargar los registros de operación','error');
+    return;
   }
-  return out;
+  registrosPorPozo = {};
+  let total = 0;
+  selected.forEach(p=>{
+    registrosPorPozo[p.id] = datos
+      .filter(r => r.op_cpozo === p.id)
+      .map(r => normalizeRegistro(r, p.id))
+      .filter(r => r.fecha);
+    total += registrosPorPozo[p.id].length;
+  });
+  if(total === 0){
+    registrosFiltrados = [];
+    renderTablaRegistros(); graficarNiveles(); clearSpecificResults();
+    Swal.fire('Sin registros','Los pozos seleccionados no tienen registros de operación con fecha.','info');
+    return;
+  }
+  Swal.fire({title: 'Listo', text: `${total} registro(s) cargado(s)`, icon: 'success', timer: 2000});
+  aplicarFiltrosYGraficar();
 }
 
 /* ============================
@@ -363,17 +369,7 @@ function setupControls(){
     Array.from(sel.options).forEach(opt => opt.selected = e.target.checked);
   });
 
-  document.getElementById('btnLoad').addEventListener('click', ()=>{
-    const sel = document.getElementById('pozosSelect');
-    const selected = Array.from(sel.selectedOptions).map(o=> ({ id:o.value, label:o.textContent }));
-    if(selected.length===0){ Swal.fire('Aviso','Seleccione al menos un pozo','warning'); return; }
-    registrosPorPozo = {};
-    selected.forEach(p=>{
-      registrosPorPozo[p.id] = generarSimuladosPara(p.label);
-    });
-    Swal.fire({title: 'Listo', text: 'Registros cargados', icon: 'success', timer: 2000});
-    aplicarFiltrosYGraficar();
-  });
+  document.getElementById('btnLoad').addEventListener('click', cargarRegistrosSeleccionados);
 
   setupDateControls();
 
@@ -622,7 +618,7 @@ function imprimirReporte(){
   w.document.write('<h3>Interpretación</h3>');
   w.document.write(interpN);
   w.document.write(interpS);
-  w.document.write('</body></html>');
+  w.document.write('<\/body></html>');
   w.document.close();
   w.focus();
   w.print();

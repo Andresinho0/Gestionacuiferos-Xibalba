@@ -166,7 +166,7 @@ let datosEditables = {};
 let todosPozos = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch('http://localhost:8080/api/lista_pozos')
+  fetch(`${API_BASE_URL}/lista_pozos`)
     .then(res => res.json())
     .then(data => {
       const dropdown = document.getElementById("dropdown");
@@ -204,8 +204,8 @@ function mostrarTabla() {
 
 function cargarDatosPozo(clave) {
   if(clave==undefined || clave=="")return;
-  const urlOperacion = `http://localhost:8080/api/operacion/pozo/${clave}`;
-  const urlMantenimiento = `http://localhost:8080/api/mantenimiento/pozo/${clave}`;
+  const urlOperacion = `${API_BASE_URL}/operacion/pozo/${clave}`;
+  const urlMantenimiento = `${API_BASE_URL}/mantenimiento/pozo/${clave}`;
 
   Promise.all([
     fetch(urlOperacion).then(res => res.json()),
