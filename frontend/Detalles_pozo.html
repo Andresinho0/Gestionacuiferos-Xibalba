@@ -206,6 +206,21 @@
                 <span class="detail-label">Altura</span>
                 <span class="detail-value" id="det-altura">Cargando...</span>
             </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Estado</span>
+                <span class="detail-value" id="det-estado">Cargando...</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Municipio</span>
+                <span class="detail-value" id="det-municipio">Cargando...</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Dependencia Informante</span>
+                <span class="detail-value" id="det-dependencia">Cargando...</span>
+            </div>
         </div>
 
         <!-- TARJETA 2: Características Físicas -->
@@ -225,6 +240,11 @@
             <div class="detail-group">
                 <span class="detail-label">Diámetro de ADEME</span>
                 <span class="detail-value"><span id="det-diam-ademe" class="highlight-value">-</span> pulgadas</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Columna de Succión</span>
+                <span class="detail-value"><span id="det-succion" class="highlight-value">-</span> metros</span>
             </div>
         </div>
 
@@ -364,6 +384,10 @@
                 document.getElementById('det-ubicacion').textContent = data.lp_ubicacion || 'No especificada';
                 document.getElementById('det-altura').textContent = formatearAltura(data.lp_altura);
                 // Tarjeta 2
+                document.getElementById('det-estado').textContent = data.lp_estado || 'No especificado';
+                document.getElementById('det-municipio').textContent = data.lp_municipio || 'No especificado';
+                document.getElementById('det-dependencia').textContent = data.lp_dependencia_informante || 'No especificada';
+                document.getElementById('det-succion').textContent = (data.lp_columna_succion ?? null) !== null ? data.lp_columna_succion : '0';
                 document.getElementById('det-profundidad').textContent = data.lp_Profundidad_perforación || '0';
                 document.getElementById('det-diam-perf').textContent = data.lp_Diámetro_perforación || '0';
                 document.getElementById('det-diam-ademe').textContent = data.lp_Diámetro_ADEME || '0';

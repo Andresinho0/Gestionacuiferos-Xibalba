@@ -82,6 +82,21 @@
                 <label for="altura">Altura (msnm)</label>
                 <input type="number" step="any" id="altura" placeholder="Ej. 2536">
             </div>
+
+            <div class="form-group">
+                <label for="lpEstado">Estado</label>
+                <input type="text" id="lpEstado" placeholder="Ej. Ciudad de México">
+            </div>
+
+            <div class="form-group">
+                <label for="lpMunicipio">Municipio</label>
+                <input type="text" id="lpMunicipio" placeholder="Ej. Xochimilco">
+            </div>
+
+            <div class="form-group">
+                <label for="lpDependencia">Dependencia informante</label>
+                <input type="text" id="lpDependencia" placeholder="Ej. SACMEX">
+            </div>
         </div>
 
         <!-- TARJETA 2: Dimensiones y Perforación -->
@@ -104,6 +119,11 @@
                 <label for="diametroADEME">Diámetro de ADEME</label>
                 <input type="range" min="10" max="40" value="20" class="slider" id="diametroADEME">
                 <div class="slider-value">Valor: <b id="valorDiametroADEME" style="color: #001182;">20</b> in</div>
+            </div>
+
+            <div class="form-group">
+                <label for="columnaSuccion">Columna de succión (m)</label>
+                <input type="number" step="0.01" min="0" id="columnaSuccion" placeholder="Ej. 45.50">
             </div>
         </div>
 
@@ -348,7 +368,11 @@
             lp_aporta_riego: document.getElementById('aportaRiego').value,
             lp_pa_cdmx: document.getElementById('paCdmx').value,
             lp_telemetria: document.getElementById('telemetria').value,
-            lp_utr: document.getElementById('utr').value
+            lp_utr: document.getElementById('utr').value,
+            lp_estado: document.getElementById('lpEstado').value.trim() || null,
+            lp_municipio: document.getElementById('lpMunicipio').value.trim() || null,
+            lp_dependencia_informante: document.getElementById('lpDependencia').value.trim() || null,
+            lp_columna_succion: document.getElementById('columnaSuccion').value.trim() === '' ? null : parseFloat(document.getElementById('columnaSuccion').value)
         };
 
         // Validación de los parámetros de calidad (todos opcionales)
@@ -438,4 +462,4 @@
   </script>
 
 </body>
-</html>
+</html>

@@ -96,6 +96,21 @@
                 <label for="altura">Altura (msnm)</label>
                 <input type="text" inputmode="decimal" id="altura" placeholder="Ej. 2536">
             </div>
+
+            <div class="form-group">
+                <label for="lpEstado">Estado</label>
+                <input type="text" id="lpEstado" placeholder="Ej. Ciudad de México">
+            </div>
+
+            <div class="form-group">
+                <label for="lpMunicipio">Municipio</label>
+                <input type="text" id="lpMunicipio" placeholder="Ej. Xochimilco">
+            </div>
+
+            <div class="form-group">
+                <label for="lpDependencia">Dependencia informante</label>
+                <input type="text" id="lpDependencia" placeholder="Ej. SACMEX">
+            </div>
         </div>
 
         <!-- TARJETA 2: Dimensiones y Perforación -->
@@ -118,6 +133,11 @@
                 <label for="diametroADEME">Diámetro de ADEME</label>
                 <input type="range" min="10" max="40" value="20" class="slider" id="diametroADEME">
                 <div class="slider-value">Valor: <b id="valorDiametroADEME" style="color: #001182;">20</b> in</div>
+            </div>
+
+            <div class="form-group">
+                <label for="columnaSuccion">Columna de succión (m)</label>
+                <input type="number" step="0.01" min="0" id="columnaSuccion" placeholder="Ej. 45.50">
             </div>
         </div>
 
@@ -439,6 +459,10 @@
         ponerValor('ramal', d.lp_ramal);
         ponerValor('ubicacion', d.lp_ubicacion);
         ponerValor('altura', d.lp_altura);
+        ponerValor('lpEstado', d.lp_estado);
+        ponerValor('lpMunicipio', d.lp_municipio);
+        ponerValor('lpDependencia', d.lp_dependencia_informante);
+        ponerValor('columnaSuccion', d.lp_columna_succion);
 
         fijarSlider('profundidad', 'valorProfundidad', d.lp_Profundidad_perforación);
         fijarSlider('diametroPerforacion', 'valorDiametroPerforacion', d.lp_Diámetro_perforación);
@@ -587,7 +611,11 @@
             lp_aporta_riego: el('aportaRiego').value,
             lp_pa_cdmx: el('paCdmx').value,
             lp_telemetria: el('telemetria').value,
-            lp_utr: el('utr').value
+            lp_utr: el('utr').value,
+            lp_estado: el('lpEstado').value.trim() || null,
+            lp_municipio: el('lpMunicipio').value.trim() || null,
+            lp_dependencia_informante: el('lpDependencia').value.trim() || null,
+            lp_columna_succion: el('columnaSuccion').value.trim() === '' ? null : parseFloat(el('columnaSuccion').value.replace(',', '.'))
         };
 
         const calidadData = {
@@ -667,4 +695,4 @@
   </script>
 
 </body>
-</html>
+</html>
