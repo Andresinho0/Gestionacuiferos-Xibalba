@@ -34,8 +34,10 @@
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-gear"></i> 1. Motor e Identificación</h3>
             
             <div class="form-group">
-                <label for="clavePozo">Clave del Pozo</label>
-                <input type="text" id="clavePozo" placeholder="Ej. LN-138" required>
+                <label for="dropdown">Selecciona el pozo</label>
+                <select id="dropdown">
+                    <option value="">Cargando...</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -373,6 +375,28 @@
         const ahora = fechaLocalISO().slice(0, 16);
         fecha.value = ahora;
         fecha.max = ahora;
+
+        // Dropdown de pozos: el valor de cada opción es la clave del pozo
+        const baseUrlPozos = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+        const dropdown = document.getElementById('dropdown');
+        fetch(`${baseUrlPozos}/lista_pozos`)
+            .then(response => {
+                if (!response.ok) throw new Error('No se pudo cargar el listado de pozos.');
+                return response.json();
+            })
+            .then(data => {
+                dropdown.innerHTML = '<option value="">Seleccione un pozo</option>';
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.l_poz_clave;
+                    option.textContent = item.lp_Nombre ? `${item.l_poz_clave} – ${item.lp_Nombre}` : item.l_poz_clave;
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar pozos:', error);
+                dropdown.innerHTML = '<option value="">Error de conexión</option>';
+            });
     });
 
     // Fecha local sin zona horaria ("2026-09-28T12:30:00") para LocalDateTime
@@ -390,7 +414,7 @@
 
     function guardarMantenimiento() {
         // Validación básica
-        const clavePozo = txt('clavePozo');
+        const clavePozo = txt('dropdown');
         if (!clavePozo) {
             Swal.fire({
                 icon: 'warning',

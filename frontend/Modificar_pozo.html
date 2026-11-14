@@ -387,6 +387,74 @@
         tarjeta.querySelectorAll('input, select').forEach(c => { c.disabled = !habilitada; });
     }
 
+    async function cargarPozo(id) {
+    const token = ++cargaToken;
+
+    idPozoActual = null;
+    calidadIdActual = null;
+    calidadDisponible = false;
+    el('forwardBtn').disabled = true;
+
+    if (!id) {
+        el('formulario').style.display = 'none';
+        return;
+    }
+
+    try {
+        // 1. Datos del pozo
+        const resp = await fetch(`${API_BASE_URL}/lista_pozos/${id}`);
+        if (!resp.ok) throw new Error('No se pudo cargar la información del pozo.');
+        const pozo = await resp.json();
+        if (token !== cargaToken) return;
+        if (!pozo) throw new Error('El pozo no existe.');
+
+        llenarPozo(pozo);
+
+        // 2. Parámetros de calidad (se cargan aparte: un fallo aquí no impide editar el pozo)
+        limpiarCalidad();
+        try {
+            const r = await fetch(`${API_BASE_URL}/parametros_calidad/pozo/${id}`);
+            if (!r.ok) throw new Error('No se pudieron cargar los parámetros de calidad.');
+            const lista = await r.json();
+            if (token !== cargaToken) return;
+
+            calidadDisponible = true;
+            if (Array.isArray(lista) && lista.length > 0) {
+                calidadIdActual = lista[0].id;
+                llenarCalidad(lista[0]);
+                if (lista.length > 1) {
+                    const aviso = el('calidad-multiple');
+                    aviso.textContent = `Este pozo tiene ${lista.length} muestras registradas; aquí se edita la primera.`;
+                    aviso.style.display = 'block';
+                }
+            }
+        } catch (errorCalidad) {
+            if (token !== cargaToken) return;
+            console.error('Error:', errorCalidad);
+            calidadDisponible = false;
+            Swal.fire({
+                icon: 'warning',
+                title: 'Parámetros de calidad no disponibles',
+                text: 'No se pudieron cargar los parámetros de calidad. Puedes editar el pozo; los parámetros no se modificarán.'
+            });
+        }
+
+        setCalidadHabilitada(calidadDisponible);
+        idPozoActual = Number(pozo.id_lp !== undefined ? pozo.id_lp : id);
+        el('formulario').style.display = 'block';
+        el('forwardBtn').disabled = false;
+
+    } catch (error) {
+        if (token !== cargaToken) return;
+        console.error('Error:', error);
+        el('formulario').style.display = 'none';
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un problema al traer los datos desde el servidor.'
+        });
+    }
+}
     // ==========================================
     // CARGA DE DATOS
     // ==========================================
@@ -470,74 +538,7 @@
         el('calidad-multiple').style.display = 'none';
     }
 
-    async function cargarPozo(id) {
-        const token = ++cargaToken;
 
-        idPozoActual = null;
-        calidadIdActual = null;
-        calidadDisponible = false;
-        el('forwardBtn').disabled = true;
-
-        if (!id) {
-            el('formulario').style.display = 'none';
-            return;
-        }
-
-        try {
-            // 1. Datos del pozo
-            const resp = await fetch(`${apiUrl()}/lista_pozos/${id}`);
-            if (!resp.ok) throw new Error('No se pudo cargar la información del pozo.');
-            const pozo = await resp.json();
-            if (token !== cargaToken) return;
-            if (!pozo) throw new Error('El pozo no existe.');
-
-            llenarPozo(pozo);
-
-            // 2. Parámetros de calidad (se cargan aparte: un fallo aquí no impide editar el pozo)
-            limpiarCalidad();
-            try {
-                const r = await fetch(`${apiUrl()}/parametros_calidad/pozo/${id}`);
-                if (!r.ok) throw new Error('No se pudieron cargar los parámetros de calidad.');
-                const lista = await r.json();
-                if (token !== cargaToken) return;
-
-                calidadDisponible = true;
-                if (Array.isArray(lista) && lista.length > 0) {
-                    calidadIdActual = lista[0].id;
-                    llenarCalidad(lista[0]);
-                    if (lista.length > 1) {
-                        const aviso = el('calidad-multiple');
-                        aviso.textContent = `Este pozo tiene ${lista.length} muestras registradas; aquí se edita la primera.`;
-                        aviso.style.display = 'block';
-                    }
-                }
-            } catch (errorCalidad) {
-                if (token !== cargaToken) return;
-                console.error('Error:', errorCalidad);
-                calidadDisponible = false;
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Parámetros de calidad no disponibles',
-                    text: 'No se pudieron cargar los parámetros de calidad. Puedes editar el pozo; los parámetros no se modificarán.'
-                });
-            }
-
-            setCalidadHabilitada(calidadDisponible);
-            idPozoActual = Number(pozo.id_lp !== undefined ? pozo.id_lp : id);
-            el('formulario').style.display = 'block';
-            el('forwardBtn').disabled = false;
-
-        } catch (error) {
-            if (token !== cargaToken) return;
-            console.error('Error:', error);
-            el('formulario').style.display = 'none';
-            Swal.fire({
-                icon: 'error',
-                title: 'Error de conexión',
-                text: 'Ocurrió un problema al traer los datos desde el servidor.'
-            });
-        }
-    }
 
     // ==========================================
     // GUARDADO
@@ -671,4 +672,4 @@
   </script>
 
 </body>
-</html>
+</html>
