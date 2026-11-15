@@ -10,38 +10,20 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
+    <style>
+      /* Tabla más ancha y con más aire en esta página */
+      .table-scroll { width: 100%; overflow-x: auto; }
+      .tabla { min-width: 1000px; }
+      .tabla thead th, .tabla tbody td { padding: 14px 16px; }
+      .tabla tbody td:nth-child(4) { white-space: nowrap; } /* fecha en una línea */
+    </style>
 </head>
 <body>
 
   <!-- Contenedor principal que empuja el footer al fondo -->
   <div class="page-content">
 
-    <header class="main-header">
-      <a href="Menu_MAIN.html" class="logo-box" title="Ir al menú principal">
-        <img src="img/iitca_logo.png" class="logo-img">
-      </a>
-
-      <div class="header-actions">
-        <!-- Notificaciones estilizadas como botón -->
-        <div class="notification-container">
-          <button type="button" class="nav-btn notification-btn" onclick="toggleNotifications()">
-            <i class="fa-solid fa-bell"></i>
-          </button>
-
-          <!-- Buzón de notificaciones -->
-          <div class="notification-dropdown" id="notificationDropdown">
-            <div class="notification-item">Nueva notificación 1</div>
-            <div class="notification-item">Nueva notificación 2</div>
-            <div class="notification-item">Nueva notificación 3</div>
-          </div>
-        </div>
-
-        <a href="index.html" class="nav-btn logout-link">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          Cerrar Sesión
-        </a>
-      </div>
-    </header>
+    <div id="header-container"></div>
 
     <h1 class="main-title">Gestión de alertas</h1>
 
@@ -59,53 +41,26 @@
         <table class="tabla">
           <colgroup>
             <col width="5%">
-            <col width="15%">
-            <col width="20%">
-            <col width="15%">
-            <col width="25%">
-            <col width="10%">
-            <col width="10%">
+            <col width="12%">
+            <col width="14%">
+            <col width="18%">
+            <col width="17%">
+            <col width="22%">
+            <col width="12%">
           </colgroup>
           <thead>
             <tr>
               <th>ID</th>
+              <th>Clave de pozo</th>
               <th>Tipo de alerta</th>
               <th>Fecha y hora de alerta</th>
               <th>Operador</th>
               <th>Observaciones de operador</th>
               <th>Alerta resuelta</th>
-              <th>Capturar alerta</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Fila de ejemplo con datos rellenados -->
-            <tr>
-              <td>1</td>
-              <td>Nivel crítico</td>
-              <td>
-                <!-- Input modernizado a datetime-local -->
-                <input type="datetime-local" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; color: #333;">
-              </td>
-              <td>Usuario Ejemplo</td>
-              <td>
-                <!-- Textarea estilizado para no desbordar la tabla -->
-                <textarea style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; color: #333; resize: vertical;" rows="2"></textarea>
-              </td>
-              <td>
-                <!-- Iconos unificados usando FontAwesome actual -->
-                <a href="#" onclick="confirmacion3()" title="Aceptar" style="margin-right: 12px;">
-                  <i class="fa-solid fa-square-check action-icon" style="color: #28a745; font-size: 1.3rem;"></i>
-                </a>
-                <a href="Alerta_no_resuelta.html" title="Cancelar">
-                  <i class="fa-solid fa-delete-left action-icon" style="color: #dc3545; font-size: 1.3rem;"></i>
-                </a>
-              </td>
-              <td>
-                <a href="Agregar_nueva_alerta.html" title="Agregar">
-                  <i class="fa-solid fa-square-plus action-icon" style="font-size: 1.3rem;"></i>
-                </a>
-              </td>
-            </tr>
+          <tbody id="tabla-alertas">
+            <tr><td colspan="7">Cargando alertas...</td></tr>
           </tbody>
         </table>
       </div>
@@ -127,6 +82,67 @@
       Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
     </small>
   </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const baseUrl = typeof API_BASE_URL !== 'undefined'
+            ? API_BASE_URL
+            : 'https://xibalbadata-java-production.up.railway.app/api';
+        const tbody = document.getElementById('tabla-alertas');
+
+        const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        const getJson = (endpoint) => fetch(`${baseUrl}/${endpoint}`).then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        });
+
+        Promise.all([
+            getJson('alertas_pozos'),
+            getJson('operadores').catch(() => [])
+        ]).then(([alertas, operadores]) => {
+            const nombres = {};
+            operadores.forEach(o => { nombres[o.id_o] = o.o_nombre; });
+
+            if (!alertas.length) {
+                tbody.innerHTML = '<tr><td colspan="7">No hay alertas registradas.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            alertas.forEach(al => {
+                const id = al.id_al ?? '';
+                const fecha = al.al_fechacap ? new Date(al.al_fechacap).toLocaleString('es-MX') : '';
+                const operador = nombres[al.al_operador] ?? al.al_operador ?? '';
+                const fila = document.createElement('tr');
+                fila.dataset.alertaId = id;
+                // La columna "Alerta resuelta" se conserva: más adelante sus acciones
+                // moverán la alerta a un historial (archivo por crear). data-alerta-id
+                // deja listo el identificador para eso.
+                fila.innerHTML = `
+                    <td>${esc(id)}</td>
+                    <td>${esc(al.al_clave_de_pozo)}</td>
+                    <td>${esc(al.al_tipo_de_alerta)}</td>
+                    <td>${esc(fecha)}</td>
+                    <td>${esc(operador)}</td>
+                    <td>${esc(al.al_comentarios)}</td>
+                    <td>
+                        <a href="#" onclick="confirmacion3()" data-alerta-id="${esc(id)}" title="Aceptar" style="margin-right: 12px;">
+                          <i class="fa-solid fa-square-check action-icon" style="color: #28a745; font-size: 1.3rem;"></i>
+                        </a>
+                        <a href="Alerta_no_resuelta.html" data-alerta-id="${esc(id)}" title="Cancelar">
+                          <i class="fa-solid fa-delete-left action-icon" style="color: #dc3545; font-size: 1.3rem;"></i>
+                        </a>
+                    </td>`;
+                tbody.appendChild(fila);
+            });
+        }).catch(err => {
+            console.error('Error al cargar alertas:', err);
+            tbody.innerHTML = '<tr><td colspan="7">Error al cargar las alertas.</td></tr>';
+        });
+    });
+  </script>
 
 </body>
 </html>

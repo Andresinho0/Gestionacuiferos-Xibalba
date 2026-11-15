@@ -156,7 +156,6 @@ function mostrarAlerta(titulo, icono = 'info', temporizador = null) {
     Swal.fire(config);
 }
 
-// Mantenemos los nombres originales para no romper tu HTML, enlazados a la nueva función
 const saludos = () => mostrarAlerta('Datos enviados y en espera, la confirmación puede tardar entre uno y tres días hábiles');
 const confirmacion = () => mostrarAlerta('Datos enviados para almacenamiento', 'success', 2500);
 const confirmacion2 = () => mostrarAlerta('Datos enviados y en espera, la confirmación puede tardar entre uno y tres días hábiles', 'success', 2500);
@@ -511,7 +510,8 @@ function agregarregistromtto() {
 
 function enviarAlerta() {
   const clavePozo = document.getElementById('dropdown').value;
-  if (!clavePozo) {
+  const operadorId = document.getElementById('operador').value;
+  if (!clavePozo || !operadorId) {
       mostrarAlerta('Por favor complete los campos requeridos.', 'error');
       return;
   }
@@ -521,7 +521,7 @@ function enviarAlerta() {
       al_tipo_de_alerta: document.getElementById('alert_tipo').value,
       al_comentarios: document.getElementById('observaciones').value,
       al_fechacap: new Date(),
-      al_operador: 1
+      al_operador: operadorId
   };
 
   Swal.fire({
@@ -542,6 +542,7 @@ function enviarAlerta() {
         .then(() => {
             mostrarAlerta('El registro se guardó correctamente.', 'success');
             document.getElementById('observaciones').value = "";
+            setTimeout(() => { window.location.href = 'Gestion_de_alerta.html'; }, 1500);
         })
         .catch(error => {
             console.error('Error:', error);

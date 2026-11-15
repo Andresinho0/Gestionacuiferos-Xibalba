@@ -1,139 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="CSS/Menu_MAIN.css">
-<script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
-<script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
-    <script src="js/script.js"></script>
-    <title>Agregar nueva alerta</title>
-    <style>
-        .slider {
-            width: 300px;
-        }
-    </style>
+    <title>Agregar Nueva Alerta - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <script src="js/script.js" defer></script>
 </head>
-<header>
-    <div >
-        <a href="Menu_MAIN.html">
-          <i class="fa-solid fa-house" style="color: aliceblue; margin-left: 1200px" ></i>
-        </a>
-        inicio
-        <a href="index.html">   
-          <i class="fa-solid fa-right-from-bracket" style="color: aliceblue"></i>
-        </a>
-        Salir
+<body>
+
+  <div class="page-content">
+
+    <!-- Header container for dynamic content -->
+    <div id="header-container"></div>
+
+    <h1 class="main-title">Captura de Alerta</h1>
+
+    <div class="panel">
+
+      <div class="panel-header" style="border-bottom: none; margin-bottom: 0;">
+        <h2>Agregar nueva alerta</h2>
       </div>
-</header>
-<body>   
 
-    <table border="1" cellpadding="15" class="tabla">
-        <caption> <h2>Agregar nueva alerta</h2></caption>
-        <thead>
-            <tr>
-                <th>Concepto</th>
-                <th>Datos</th>
-            </tr>
-        </thead>
-        
-        <tbody>
-            <tr>
-                <td>
-                    <div>
-                        <a>Clave de pozo</a>
-                    </div>
-                </td>
-                <td>
+      <div class="cards-grid">
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            // Llamada a la API REST para obtener los datos
-                            fetch('http://localhost:8080/api/lista_pozos')
-                                .then(response => response.json())
-                                .then(data => {
-                                    const dropdown = document.getElementById("dropdown");
-                                    dropdown.innerHTML = ''; // Limpiar opciones anteriores
-                                    data.forEach(item => {
-                                        const option = document.createElement("option");
-                                        option.value = item.l_poz_clave;
-                                        option.textContent = item.l_poz_clave;
-                                        dropdown.appendChild(option);
-                                    });
-                                })
-                                .catch(error => console.error('Error al cargar datos:', error));
-                        });
-                    </script>
-                    <form>
-                        <label for="dropdown"></label>
-                        <select id="dropdown" name="dropdown">
-                            <option value=""></option>
-                        </select>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a>Tipo de alerta</a>
-                </td>
-                <td>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            // Llamada a la API REST para obtener los datos
-                            fetch('http://localhost:8080/api/alertas_tipo')
-                                .then(response => response.json())
-                                .then(data => {
-                                    const alert_tipo = document.getElementById("alert_tipo");
-                                    alert_tipo.innerHTML = ''; // Limpiar opciones anteriores
-                                    data.forEach(item => {
-                                        const option1 = document.createElement("option");
-                                        option1.value = item.alert_tipo;
-                                        option1.textContent = item.alert_tipo;
-                                        alert_tipo.appendChild(option1);
-                                    });
-                                })
-                                .catch(error => console.error('Error al cargar datos:', error));
-                        });
-                    </script>
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-triangle-exclamation"></i> Datos</h3>
 
-                        <label for="alert_tipo"></label>
-                        <select id="alert_tipo" name="alert_tipo">
-                            <option value=""></option>
-                        </select>
+            <div class="form-group">
+                <label for="dropdown">Clave de pozo</label>
+                <select id="dropdown" name="dropdown" required>
+                    <option value="">Cargando pozos...</option>
+                </select>
+            </div>
 
-              
-                </td>
-            </tr>
-            
-                <td>
-                    <a>Observaciones</a>
-                </td>
-                <td>
-                    <input type="text" id="observaciones">
-                </td>
-            </tr>
+            <div class="form-group">
+                <label for="alert_tipo">Tipo de alerta</label>
+                <select id="alert_tipo" name="alert_tipo" required>
+                    <option value="">Cargando tipos de alerta...</option>
+                </select>
+            </div>
 
-        </tbody>
-    </table>
-    <section class="botones">
-       
-        <div class="button-container1">
-          <!-- Botón de Regresar -->
-          <button class="btn" onclick="gestiondeAlerta()" id="backBtn">
-              Regresar
-          </button>
-    
-          <!-- Botón de Avanzar -->
-          <button class="btn" onclick="enviarAlerta()" >
-              Enviar
-          </button>    
-    </section>
+            <div class="form-group">
+                <label for="operador">Operador que reporta</label>
+                <select id="operador" name="operador" required>
+                    <option value="">Cargando operadores...</option>
+                </select>
+            </div>
 
-    <footer>
-      <small>
-        <div class="leyenda"> &copy; Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.</span>
-      </small>
+            <div class="form-group">
+                <label for="observaciones">Observaciones</label>
+                <textarea id="observaciones" rows="4" placeholder="Comentarios u observaciones de la alerta..."></textarea>
+            </div>
+        </div>
+
+      </div>
+
+      <div class="button-container1">
+        <button class="btn" onclick="gestiondeAlerta()" id="backBtn">
+            <i class="fa-solid fa-arrow-left"></i> Regresar
+        </button>
+        <button class="btn" onclick="enviarAlerta()" id="forwardBtn">
+            <i class="fa-solid fa-paper-plane"></i> Enviar
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <small>
+      <div class="leyenda">&copy; Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.</div>
+    </small>
   </footer>
-      <!--Colocar el texto centrado y en la parte inferior de la pantlla-->
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const baseUrl = typeof API_BASE_URL !== 'undefined'
+            ? API_BASE_URL
+            : 'https://xibalbadata-java-production.up.railway.app/api';
+
+        // Llena un <select> a partir de un endpoint
+        function cargarSelect(endpoint, selectId, campo, placeholder, campoValor) {
+            const select = document.getElementById(selectId);
+            fetch(`${baseUrl}/${endpoint}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    select.innerHTML = `<option value="">${placeholder}</option>`;
+                    data.forEach(item => {
+                        const option = document.createElement("option");
+                        option.value = item[campoValor || campo];
+                        option.textContent = item[campo];
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error(`Error al cargar ${endpoint}:`, error);
+                    select.innerHTML = '<option value="">Error al cargar datos</option>';
+                });
+        }
+
+        cargarSelect('lista_pozos', 'dropdown', 'l_poz_clave', 'Seleccione un pozo...');
+        cargarSelect('alertas_tipo', 'alert_tipo', 'alert_tipo', 'Seleccione un tipo de alerta...');
+        cargarSelect('operadores', 'operador', 'o_nombre', 'Seleccione un operador...', 'id_o');
+    });
+  </script>
+
 </body>
 </html>
