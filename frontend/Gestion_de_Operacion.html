@@ -170,11 +170,15 @@
     <div class="panel">
       
       <div class="panel-header" style="border-bottom: 2px solid rgba(255, 255, 255, 0.2); padding-bottom: 15px;">
-        <h2>Historial de operaciones</h2>
-        <!-- El botón "Nueva operación" ahora también podría enviar el id del pozo si lo deseas -->
-        <a href="Agregar_registro_operacion.html" class="add-btn">
-          <i class="fa-solid fa-square-plus"></i> Nueva operación
-        </a>
+        <h2>Operaciones pendientes</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="Historial_operacion.html" class="add-btn" id="link-historial">
+            <i class="fa-solid fa-clock-rotate-left"></i> Ver historial de este pozo
+          </a>
+          <a href="Agregar_registro_operacion.html" class="add-btn">
+            <i class="fa-solid fa-square-plus"></i> Nueva operación
+          </a>
+        </div>
       </div>
 
       <!-- Contenedor Grid en lugar de la tabla -->
@@ -217,103 +221,99 @@
             return;
         }
 
-        const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'https://xibalbadata-java-production.up.railway.app/api';
+        document.getElementById('link-historial').href =
+            `Historial_operacion.html?pozo=${encodeURIComponent(idPozo)}`;
 
-        // Obtenemos todas las operaciones y luego filtramos
-        fetch(`${baseUrl}/operacion`)
-            .then(response => {
-                if (!response.ok) throw new Error("Error al obtener operaciones");
-                return response.json();
-            })
-            .then(data => {
-                const grid = document.querySelector('.cards-grid');
-                if (!grid) return;
-                
-                grid.innerHTML = ''; 
+        const grid = document.querySelector('.cards-grid');
+        const mensaje = (texto, color) =>
+            `<div style="grid-column: 1/-1; text-align: center; color: ${color}; padding: 40px;">${texto}</div>`;
 
-                const operacionesFiltradas = (data || []).filter(op => op.idLp == idPozo);
+        function cargarPendientes() {
+            // No existe /pendientes/pozo/{id}: se piden todos los pendientes y se filtra por pozo
+            fetch(`${API_BASE_URL}/operacion/pendientes`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al obtener operaciones");
+                    return response.json();
+                })
+                .then(data => {
+                    grid.innerHTML = '';
 
-                if (operacionesFiltradas.length === 0) {
-                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 40px;">No hay registros de operación para este pozo.</div>';
-                    return;
-                }
+                    const operacionesFiltradas = (data || []).filter(op => op.idLp == idPozo);
 
-            operacionesFiltradas.forEach(op => {
-                    // Imprimimos el objeto en consola para que, si falla, puedas presionar F12 y ver el nombre exacto
-                    console.log("Datos del pozo evaluado:", op);
-
-                    const id = op.id_op || op.id || 'N/A'; 
-                    const pozo = op.op_cpozo || 'Sin Pozo';
-                    const operador = op.op_operador || 'No asignado';
-                    
-                    // LECTURA DEFENSIVA: Atrapamos cualquier variante que Spring Boot haya generado
-                    const estadoOperando = op.op_operando || op.opOperando || op.op_Operando || op.operando || 'No';
-                    
-                    // Limpiamos espacios extra y pasamos a minúsculas para que "Si", "si", o " SI " funcionen igual
-                    const esActivo = String(estadoOperando).trim().toLowerCase() === 'si' || String(estadoOperando).trim().toLowerCase() === 'sí';
-                    
-                    // Asignamos verde si está activo, rojo si está inactivo
-                    const colorBadge = esActivo ? '#28a745' : '#dc3545'; 
-                    const textoBadge = esActivo ? 'Activo' : 'Inactivo';
-
-                    let fechaFormateada = 'Sin fecha';
-                    if (op.op_fecha_captura) {
-                        const fechaObj = new Date(op.op_fecha_captura);
-                        fechaFormateada = fechaObj.toLocaleString('es-MX', { 
-                            year: 'numeric', month: 'short', day: 'numeric', 
-                            hour: '2-digit', minute: '2-digit' 
-                        });
+                    if (operacionesFiltradas.length === 0) {
+                        grid.innerHTML = mensaje('No hay operaciones pendientes para este pozo.', '#64748b');
+                        return;
                     }
 
-                    const card = document.createElement('div');
-                    card.className = 'registro-card';
-                    card.innerHTML = `
-                        <div class="registro-header">
-                            <h3><i class="fa-solid fa-hashtag"></i> ID: ${id} - ${pozo}</h3>
-                            <div>
-                                <span class="badge-actividad" style="background-color: ${colorBadge}; margin-right: 5px;">
-                                    ${textoBadge}
-                                </span>
-                                <span class="badge-actividad">Captura en campo</span>
+                    operacionesFiltradas.forEach(op => {
+                        const id = op.id_op || op.id || 'N/A';
+                        const pozo = op.op_cpozo || 'Sin Pozo';
+                        const operador = op.op_operador || 'No asignado';
+
+                        // LECTURA DEFENSIVA: Atrapamos cualquier variante que Spring Boot haya generado
+                        const estadoOperando = op.op_operando || op.opOperando || op.op_Operando || op.operando || 'No';
+                        const operando = String(estadoOperando).trim().toLowerCase();
+                        const esActivo = operando === 'si' || operando === 'sí';
+
+                        const colorBadge = esActivo ? '#28a745' : '#dc3545';
+                        const textoBadge = esActivo ? 'Activo' : 'Inactivo';
+
+                        const card = document.createElement('div');
+                        card.className = 'registro-card';
+                        card.innerHTML = `
+                            <div class="registro-header">
+                                <h3><i class="fa-solid fa-hashtag"></i> ID: ${escaparHtml(id)} - ${escaparHtml(pozo)}</h3>
+                                <div>
+                                    <span class="badge-actividad" style="background-color: ${colorBadge}; margin-right: 5px;">
+                                        ${textoBadge}
+                                    </span>
+                                    <span class="badge-actividad">Pendiente</span>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="registro-body">
 
-                            <div class="detail-group">
-                                <span class="detail-label"><i class="fa-solid fa-clock"></i> Fecha y hora de registro</span>
-                                <span class="detail-value" style="font-size: 0.95rem;">${fechaFormateada}</span>
+                            <div class="registro-body">
+
+                                <div class="detail-group">
+                                    <span class="detail-label"><i class="fa-solid fa-clock"></i> Fecha y hora de registro</span>
+                                    <span class="detail-value" style="font-size: 0.95rem;">${escaparHtml(formatearFechaHora(op.op_fecha_captura))}</span>
+                                </div>
+
+                                <div class="detail-group">
+                                    <span class="detail-label"><i class="fa-solid fa-user-gear"></i> Operador</span>
+                                    <span class="detail-value">${escaparHtml(operador)}</span>
+                                </div>
+
                             </div>
 
-                            <div class="detail-group">
-                                <span class="detail-label"><i class="fa-solid fa-user-gear"></i> Operador</span>
-                                <span class="detail-value">${operador}</span>
-                            </div>
-
-                        </div>
-
-                        <div class="registro-footer">
-                            <a href="Registro_operacion.html?id=${id}" class="btn-ver">
-                                <i class="fa-solid fa-eye"></i> Ver Registro
-                            </a>
-                            
-                            <div class="acciones">
-                                <a href="Editar_Operacion.html?id=${id}" title="Editar" class="icon-edit">
-                                    <i class="fa-solid fa-pen-to-square"></i>
+                            <div class="registro-footer">
+                                <a href="Registro_operacion.html?id=${encodeURIComponent(id)}" class="btn-ver">
+                                    <i class="fa-solid fa-eye"></i> Ver Registro
                                 </a>
+
+                                <div class="acciones">
+                                    <a href="#" title="Completar" class="icon-accept" data-accion="completar">
+                                        <i class="fa-solid fa-square-check"></i>
+                                    </a>
+                                    <a href="Editar_Operacion.html?id=${encodeURIComponent(id)}" title="Editar" class="icon-edit">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
+                        `;
+                        card.querySelector('[data-accion="completar"]').addEventListener('click', e => {
+                            e.preventDefault();
+                            completarRegistro('operacion', id, cargarPendientes);
+                        });
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar operaciones:', error);
+                    grid.innerHTML = mensaje('Error al cargar las operaciones desde el servidor.', '#dc3545');
                 });
-            })
-            .catch(error => {
-                console.error('Error al cargar operaciones:', error);
-                const grid = document.querySelector('.cards-grid');
-                if (grid) {
-                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #dc3545; padding: 40px;">Error al cargar las operaciones desde el servidor.</div>';
-                }
-            });
+        }
+
+        cargarPendientes();
     });
   </script>
 

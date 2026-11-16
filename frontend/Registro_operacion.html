@@ -88,6 +88,26 @@
             </div>
         </div>
 
+        <!-- TARJETA 4: Cierre (solo si la operación está completada) -->
+        <div class="tarjeta" id="tarjeta-cierre" style="display: none;">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-square-check"></i> 4. Cierre</h3>
+
+            <div class="detail-group">
+                <span class="detail-label">Completada el</span>
+                <span class="detail-value" id="det-completada-en">-</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Completada por</span>
+                <span class="detail-value" id="det-completada-por">-</span>
+            </div>
+
+            <div class="detail-group">
+                <span class="detail-label">Notas de cierre</span>
+                <span class="detail-value" id="det-notas-cierre" style="font-style: italic;">-</span>
+            </div>
+        </div>
+
       </div>
 
       <div class="button-container1">
@@ -154,6 +174,20 @@
                 document.getElementById('det-gasto').textContent = data.op_gasto ? `${data.op_gasto} L/s` : '0 L/s';
                 document.getElementById('det-presion').textContent = data.op_presion ? `${data.op_presion} PSI` : '0 PSI';
                 document.getElementById('det-observaciones').textContent = data.op_observaciones || 'Ninguna';
+
+                // Datos de cierre: solo se muestran si la operación ya fue completada
+                if (data.estado === 'completada') {
+                    document.getElementById('det-completada-en').textContent = formatearFechaHora(data.completada_en, 'Sin fecha');
+                    document.getElementById('det-notas-cierre').textContent = data.notas_cierre || 'Sin notas';
+                    const cerradaPor = document.getElementById('det-completada-por');
+                    cerradaPor.textContent = data.completada_por ?? 'No registrado';
+                    if (data.completada_por != null) {
+                        cargarMapaOperadores().then(nombres => {
+                            if (nombres[data.completada_por]) cerradaPor.textContent = nombres[data.completada_por];
+                        });
+                    }
+                    document.getElementById('tarjeta-cierre').style.display = '';
+                }
             })
             .catch(error => {
                 console.error('Error:', error);

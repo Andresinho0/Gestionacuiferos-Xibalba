@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Operaciones - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <script src="js/script.js" defer></script>
+    <style>
+      .table-scroll { width: 100%; overflow-x: auto; }
+      .tabla { min-width: 1000px; }
+      .tabla thead th, .tabla tbody td { padding: 14px 16px; }
+      .tabla tbody td:nth-child(3), .tabla tbody td:nth-child(4) { white-space: nowrap; }
+
+      .filtros {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          align-items: center;
+          justify-content: center;
+          background: #fff;
+          padding: 15px;
+          margin: 20px auto;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .filtros label { font-weight: bold; color: #004982; margin-right: 6px; }
+
+      .filtros select, .filtros input {
+          padding: 8px 12px;
+          border-radius: 6px;
+          border: 1px solid #cbd5e1;
+          font-family: inherit;
+          outline: none;
+          min-width: 220px;
+      }
+    </style>
+</head>
+<body>
+
+  <div class="page-content">
+
+    <div id="header-container"></div>
+
+    <h1 class="main-title">Historial de operaciones</h1>
+
+    <div class="panel">
+
+      <div class="panel-header">
+        <h2>Operaciones completadas</h2>
+        <a href="Operacion_pozo.html" class="add-btn">
+          <i class="fa-solid fa-list-check"></i>
+          Ver pendientes
+        </a>
+      </div>
+
+      <div class="filtros">
+        <div>
+          <label for="filtroPozo">Pozo:</label>
+          <select id="filtroPozo">
+            <option value="">Todos los pozos</option>
+          </select>
+        </div>
+        <div>
+          <label for="filtroGeneral">Buscar:</label>
+          <input type="text" id="filtroGeneral" placeholder="Operador, notas, fecha...">
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="tabla">
+          <colgroup>
+            <col width="6%">
+            <col width="12%">
+            <col width="16%">
+            <col width="16%">
+            <col width="16%">
+            <col width="26%">
+            <col width="8%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Clave de pozo</th>
+              <th>Fecha de captura</th>
+              <th>Completada el</th>
+              <th>Completada por</th>
+              <th>Notas de cierre</th>
+              <th>Registro</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-historial">
+            <tr><td colspan="7">Cargando historial...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="button-container1">
+        <button class="btn" onclick="menumain()" id="backBtn">
+            <i class="fa-solid fa-arrow-left"></i>
+            Regresar
+        </button>
+      </div>
+
+    </div> <!-- /.panel -->
+
+  </div> <!-- /.page-content -->
+
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i>
+      Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const tbody = document.getElementById('tabla-historial');
+        const selectPozo = document.getElementById('filtroPozo');
+        const inputBuscar = document.getElementById('filtroGeneral');
+        const pozoInicial = new URLSearchParams(window.location.search).get('pozo') || '';
+
+        let nombresOperadores = {};
+
+        const filaMensaje = (texto) => `<tr><td colspan="7">${texto}</td></tr>`;
+
+        function filtrarFilas() {
+            const filtro = inputBuscar.value.toLowerCase();
+            tbody.querySelectorAll('tr[data-registro]').forEach(fila => {
+                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? '' : 'none';
+            });
+        }
+
+        function cargarHistorial() {
+            const idPozo = selectPozo.value;
+            // El backend ya entrega del más reciente al más antiguo
+            const url = idPozo
+                ? `${API_BASE_URL}/operacion/historial/pozo/${encodeURIComponent(idPozo)}`
+                : `${API_BASE_URL}/operacion/historial`;
+
+            tbody.innerHTML = filaMensaje('Cargando historial...');
+
+            fetch(url)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(registros => {
+                    if (!registros || !registros.length) {
+                        tbody.innerHTML = filaMensaje(idPozo
+                            ? 'Este pozo no tiene operaciones completadas.'
+                            : 'No hay operaciones completadas.');
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    registros.forEach(op => {
+                        const id = op.id_op ?? op.id ?? '';
+                        const cerradaPor = nombresOperadores[op.completada_por] ?? op.completada_por ?? '—';
+                        const fila = document.createElement('tr');
+                        fila.dataset.registro = id;
+                        fila.innerHTML = `
+                            <td>${escaparHtml(id)}</td>
+                            <td>${escaparHtml(op.op_cpozo ?? '')}</td>
+                            <td>${escaparHtml(formatearFechaHora(op.op_fecha_captura, '—'))}</td>
+                            <td>${escaparHtml(formatearFechaHora(op.completada_en, '—'))}</td>
+                            <td>${escaparHtml(cerradaPor)}</td>
+                            <td>${escaparHtml(op.notas_cierre || '—')}</td>
+                            <td>
+                                <a href="Registro_operacion.html?id=${encodeURIComponent(id)}" class="btn-outline" style="color: #004982; border-color: #004982; padding: 4px 10px;">Ver</a>
+                            </td>`;
+                        tbody.appendChild(fila);
+                    });
+                    filtrarFilas();
+                })
+                .catch(err => {
+                    console.error('Error al cargar el historial de operaciones:', err);
+                    tbody.innerHTML = filaMensaje('Error al cargar el historial.');
+                });
+        }
+
+        function cargarPozos() {
+            return fetch(`${API_BASE_URL}/lista_pozos`)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(pozos => {
+                    (pozos || []).forEach(p => {
+                        const opcion = document.createElement('option');
+                        opcion.value = p.id_lp;
+                        opcion.textContent = `${p.l_poz_clave || 'N/A'} — ${p.lp_Nombre || 'Sin nombre'}`;
+                        selectPozo.appendChild(opcion);
+                    });
+                })
+                .catch(err => console.error('Error al cargar pozos:', err));
+        }
+
+        selectPozo.addEventListener('change', cargarHistorial);
+        inputBuscar.addEventListener('input', filtrarFilas);
+
+        Promise.all([cargarMapaOperadores(), cargarPozos()]).then(([nombres]) => {
+            nombresOperadores = nombres;
+            if (pozoInicial) {
+                // Si el pozo de la URL no está en la lista, se agrega para poder consultarlo igual
+                if (![...selectPozo.options].some(o => o.value === pozoInicial)) {
+                    const opcion = document.createElement('option');
+                    opcion.value = pozoInicial;
+                    opcion.textContent = `Pozo ${pozoInicial}`;
+                    selectPozo.appendChild(opcion);
+                }
+                selectPozo.value = pozoInicial;
+            }
+            cargarHistorial();
+        });
+    });
+  </script>
+
+</body>
+</html>

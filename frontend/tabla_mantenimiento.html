@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="CSS/Menu_MAIN.css">
     
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
     <script src="js/script.js" defer></script>
 
     <style>
@@ -145,6 +146,24 @@
             display: block;
         }
 
+        .btn-completar {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-completar:hover {
+            background: #218838;
+        }
+
         .chevron-icon {
             color: #004982;
             transition: transform 0.3s ease;
@@ -171,15 +190,20 @@
     </div>
   </header>
 
-  <h1 class="main-title">Registros de Mantenimiento</h1>
+  <h1 class="main-title">Mantenimientos pendientes</h1>
 
   <div class="panel">
     
     <div class="panel-header">
       <h2>Listado Detallado</h2>
-      <a href="Registro_mtto.html" class="add-btn">
-        <i class="fa-regular fa-square-plus"></i> Agregar mantenimiento
-      </a>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="Historial_mtto.html" class="add-btn">
+          <i class="fa-solid fa-clock-rotate-left"></i> Ver historial
+        </a>
+        <a href="Registro_mtto.html" class="add-btn">
+          <i class="fa-regular fa-square-plus"></i> Agregar mantenimiento
+        </a>
+      </div>
     </div>
 
     <!-- Buscador General -->
@@ -209,84 +233,64 @@
 
   <script>
       document.addEventListener("DOMContentLoaded", function() {
-          const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+          const contenedor = document.getElementById("contenedor-mantenimientos");
 
-          fetch(`${baseUrl}/mantenimiento`)
-              .then(response => response.json())
-              .then(data => {
-                  const contenedor = document.getElementById("contenedor-mantenimientos");
-                  contenedor.innerHTML = ''; 
-                  
-                  if (!data || data.length === 0) {
-                      contenedor.innerHTML = '<div class="empty-state" style="text-align:center; padding:40px;">No hay registros de mantenimiento disponibles.</div>';
-                      return;
-                  }
-                  
-                  data.forEach(item => {
-                      const record = document.createElement("div");
-                      record.className = "registro-mtto";
-                      
-                      record.innerHTML = `
-                          <!-- HEADER DEL DROPDOWN -->
-                          <div class="registro-header" onclick="this.parentElement.classList.toggle('expanded')">
-                              <h2><i class="fa-solid fa-wrench"></i> Clave Pozo: ${item.mtto_clave_pozo || 'N/A'}</h2>
-                              <div class="header-info">
-                                  <span style="color: #64748b; font-weight: bold;">Fecha: ${item.mtto_fecha_captura ? new Date(item.mtto_fecha_captura).toLocaleDateString() : 'N/A'}</span>
-                                  <i class="fa-solid fa-chevron-down chevron-icon"></i>
-                              </div>
-                          </div>
-                          
-                          <!-- CONTENIDO OCULTO (TARJETAS) -->
-                          <div class="contenido-expandible">
-                              <div class="cards-grid">
-                                  <!-- TARJETA 1: Motor -->
-                                  <div class="tarjeta">
-                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-gear"></i> 1. Motor</h3>
-                                      <div class="detail-group"><span class="detail-label">Tipo</span><span class="detail-value">${item.mtto_motor_tipo || '-'}</span></div>
-                                      <div class="detail-group"><span class="detail-label">Potencia (HP / KW)</span><span class="detail-value">${item.mtto_motor_hp || '0'} HP / ${item.mtto_motor_kw || '0'} KW</span></div>
-                                      <div class="detail-group"><span class="detail-label">Eficiencia</span><span class="detail-value">${item.mtto_motor_eficiencia || '0'}%</span></div>
-                                      <div class="detail-group"><span class="detail-label">Bomba (Marca)</span><span class="detail-value">${item.mtto_bomba_marca || '-'}</span></div>
-                                      <div class="detail-group"><span class="detail-label">Bomba (Gasto / RPM / HP)</span><span class="detail-value">${item.mtto_bomba_lps ?? '-'} L/s / ${item.mtto_bomba_rpm ?? '-'} RPM / ${item.mtto_bomba_hp ?? '-'} HP</span></div>
-                                  </div>
+          function cargarPendientes() {
+              fetch(`${API_BASE_URL}/mantenimiento/pendientes`)
+                  .then(response => {
+                      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                      return response.json();
+                  })
+                  .then(data => {
+                      contenedor.innerHTML = '';
 
-                                  <!-- TARJETA 2: Equipamiento Eléctrico -->
-                                  <div class="tarjeta">
-                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
-                                      <div class="detail-group"><span class="detail-label">Tablero (Tipo / Cap.)</span><span class="detail-value">${item.mtto_tablero_tipo || '-'} / ${item.mtto_tablero_capacidad || '0'} A</span></div>
-                                      <div class="detail-group"><span class="detail-label">Tablero (Marca / HP / Voltaje)</span><span class="detail-value">${item.mtto_tablero_marca || '-'} / ${item.mtto_tablero_hp ?? '-'} HP / ${item.mtto_tablero_voltaje ?? '-'} V</span></div>
-                                      <div class="detail-group"><span class="detail-label">Transformador (Marca / Cap.)</span><span class="detail-value">${item.mtto_transformador_marca || item.mtto_transformador_tipo || '-'} / ${item.mtto_transformador_capacidad || '0'} kVA</span></div>
-                                      <div class="detail-group"><span class="detail-label">Transformador Seco</span><span class="detail-value">${item.mtto_trans_seco || '-'}</span></div>
-                                      <div class="detail-group"><span class="detail-label">Panel Solar / Baterías</span><span class="detail-value">${item.mtto_panel_solar || '-'} / ${item.mtto_banco_baterias || '-'}</span></div>
-                                      <div class="detail-group"><span class="detail-label">Sistema de Tierras</span><span class="detail-value">${item.mtto_sistema_tierras || '-'}</span></div>
-                                  </div>
+                      if (!data || data.length === 0) {
+                          contenedor.innerHTML = '<div class="empty-state" style="text-align:center; padding:40px;">No hay mantenimientos pendientes.</div>';
+                          return;
+                      }
 
-                                  <!-- TARJETA 3: Medidores y Tubería -->
-                                  <div class="tarjeta">
-                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Medidores y Tubería</h3>
-                                      <div class="detail-group"><span class="detail-label">Medidores (Presión / Flujo)</span><span class="detail-value">${item.mtto_medidor_presion || '0'} kg/cm² / ${item.mtto_medidor_flujo || '0'} L/s</span></div>
-                                      <div class="detail-group"><span class="detail-label">Medidores N.E. / N.D.</span><span class="detail-value">${item.mtto_medidor_NE || '-'} / ${item.mtto_medidor_ND || '-'}</span></div>
-                                      <div class="detail-group"><span class="detail-label">Tubería (Diámetro / Longitud)</span><span class="detail-value">${item.mtto_tuberia_diametro || '0'} in / ${item.mtto_tuberia_longitud || '0'} m</span></div>
-                                      <div class="detail-group"><span class="detail-label">Poliducto / Sanitaria</span><span class="detail-value">${item.mtto_poliducto || '-'} / ${item.mtto_sanitaria || '-'}</span></div>
-                                  </div>
+                      data.forEach(item => {
+                          const id = idRegistroMtto(item);
+                          const fecha = item.mtto_fecha_captura ? new Date(item.mtto_fecha_captura).toLocaleDateString() : 'N/A';
+                          const record = document.createElement("div");
+                          record.className = "registro-mtto";
 
-                                  <!-- TARJETA 4: Cableado y Observaciones -->
-                                  <div class="tarjeta">
-                                      <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 4. Cableado y Notas</h3>
-                                      <div class="detail-group"><span class="detail-label">Cable Transformador-Arrancador</span><span class="detail-value">Tipo: ${item.mtto_cable_transformador || '-'} | Cal: ${item.mtto_calibre_arrancador || '-'} | ${item.mtto_longitud_arrancador || '0'}m</span></div>
-                                      <div class="detail-group"><span class="detail-label">Cable Arrancador-Bomba</span><span class="detail-value">Tipo: ${item.mtto_cable_bomba || '-'} | Cal: ${item.mtto_calibre_bomba || '-'} | ${item.mtto_longitud_bomba || '0'}m</span></div>
-                                      <div class="detail-group"><span class="detail-label">Observaciones</span><span class="detail-value" style="font-style:italic;">${item.mtto_observaciones || 'Ninguna'}</span></div>
+                          record.innerHTML = `
+                              <!-- HEADER DEL DROPDOWN -->
+                              <div class="registro-header" onclick="this.parentElement.classList.toggle('expanded')">
+                                  <h2><i class="fa-solid fa-wrench"></i> Clave Pozo: ${escaparHtml(item.mtto_clave_pozo || 'N/A')}</h2>
+                                  <div class="header-info">
+                                      <span style="color: #64748b; font-weight: bold;">Fecha: ${escaparHtml(fecha)}</span>
+                                      <button type="button" class="btn-completar" title="Marcar como completado">
+                                          <i class="fa-solid fa-square-check"></i>
+                                      </button>
+                                      <i class="fa-solid fa-chevron-down chevron-icon"></i>
                                   </div>
                               </div>
-                          </div>
-                      `;
 
-                      contenedor.appendChild(record);
+                              <!-- CONTENIDO OCULTO (TARJETAS) -->
+                              <div class="contenido-expandible">
+                                  ${detalleMttoHtml(item)}
+                              </div>
+                          `;
+
+                          record.querySelector('.btn-completar').addEventListener('click', e => {
+                              e.stopPropagation(); // no abrir/cerrar el acordeón
+                              completarRegistro('mantenimiento', id, cargarPendientes);
+                          });
+
+                          contenedor.appendChild(record);
+                      });
+
+                      filtrarRegistros(); // respeta el texto de búsqueda tras repintar
+                  })
+                  .catch(error => {
+                      console.error('Error al cargar los datos:', error);
+                      contenedor.innerHTML = '<div class="empty-state" style="text-align:center; color:red;">Hubo un problema al cargar los datos del servidor.</div>';
                   });
-              })
-              .catch(error => {
-                  console.error('Error al cargar los datos:', error);
-                  document.getElementById("contenedor-mantenimientos").innerHTML = '<div class="empty-state" style="text-align:center; color:red;">Hubo un problema al cargar los datos del servidor.</div>';
-              });
+          }
+
+          cargarPendientes();
       });
 
       // La función de filtrado sigue funcionando igual porque lee el textContent (aunque esté oculto)

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Mantenimiento - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <script src="js/script.js" defer></script>
+
+    <style>
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .tarjeta {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .tarjeta-titulo {
+            color: #004982;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-group {
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .detail-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1rem;
+            color: #0f172a;
+            font-weight: 300;
+        }
+
+        .registro-mtto {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .registro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            background-color: #ffffff;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .registro-header:hover {
+            background-color: #f1f5f9;
+        }
+
+        .registro-header h2 {
+            color: #004982;
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #64748b;
+            font-weight: 300;
+        }
+
+        .badge-completada {
+            background: #28a745;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .cierre-resumen {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #28a745;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 20px;
+        }
+
+        .filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            background: #fff;
+            padding: 15px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filtros label { font-weight: bold; color: #004982; margin-right: 6px; }
+
+        .filtros select, .filtros input {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+            outline: none;
+            min-width: 220px;
+        }
+
+        .contenido-expandible {
+            display: none;
+            padding: 0 25px 25px 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .registro-mtto.expanded .contenido-expandible {
+            display: block;
+        }
+
+        .chevron-icon {
+            color: #004982;
+            transition: transform 0.3s ease;
+        }
+
+        .registro-mtto.expanded .chevron-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+
+  <div class="page-content">
+
+    <div id="header-container"></div>
+
+    <h1 class="main-title">Historial de mantenimiento</h1>
+
+    <div class="panel">
+
+      <div class="panel-header">
+        <h2>Mantenimientos completados</h2>
+        <a href="tabla_mantenimiento.html" class="add-btn">
+          <i class="fa-solid fa-list-check"></i> Ver pendientes
+        </a>
+      </div>
+
+      <div class="filtros">
+        <div>
+          <label for="filtroPozo">Pozo:</label>
+          <select id="filtroPozo">
+            <option value="">Todos los pozos</option>
+          </select>
+        </div>
+        <div>
+          <label for="filtroGeneral">Buscar:</label>
+          <input type="text" id="filtroGeneral" placeholder="Clave, operador, notas...">
+        </div>
+      </div>
+
+      <div id="contenedor-historial" style="width: 95%; margin: auto;">
+          <div class="empty-state">Cargando historial...</div>
+      </div>
+
+      <div class="button-container1">
+        <button class="btn" onclick="menumain()" id="backBtn">
+            <i class="fa-solid fa-arrow-left"></i> Regresar
+        </button>
+      </div>
+
+    </div> <!-- /.panel -->
+
+  </div> <!-- /.page-content -->
+
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i>
+      Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const contenedor = document.getElementById('contenedor-historial');
+        const selectPozo = document.getElementById('filtroPozo');
+        const inputBuscar = document.getElementById('filtroGeneral');
+        const pozoInicial = new URLSearchParams(window.location.search).get('pozo') || '';
+
+        let nombresOperadores = {};
+
+        const mensaje = (texto, color = '') =>
+            `<div class="empty-state" style="text-align:center; padding:40px;${color ? ` color:${color};` : ''}">${texto}</div>`;
+
+        function filtrarRegistros() {
+            const filtro = inputBuscar.value.toLowerCase();
+            contenedor.querySelectorAll('.registro-mtto').forEach(registro => {
+                registro.style.display = registro.textContent.toLowerCase().includes(filtro) ? '' : 'none';
+            });
+        }
+
+        function cargarHistorial() {
+            const clave = selectPozo.value;
+            // En mantenimiento el historial por pozo se consulta con la clave del pozo
+            const url = clave
+                ? `${API_BASE_URL}/mantenimiento/historial/pozo/${encodeURIComponent(clave)}`
+                : `${API_BASE_URL}/mantenimiento/historial`;
+
+            contenedor.innerHTML = mensaje('Cargando historial...');
+
+            fetch(url)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(registros => {
+                    if (!registros || !registros.length) {
+                        contenedor.innerHTML = mensaje(clave
+                            ? 'Este pozo no tiene mantenimientos completados.'
+                            : 'No hay mantenimientos completados.');
+                        return;
+                    }
+
+                    contenedor.innerHTML = '';
+                    registros.forEach(item => {
+                        const cerradaPor = nombresOperadores[item.completada_por] ?? item.completada_por ?? '—';
+                        const record = document.createElement('div');
+                        record.className = 'registro-mtto';
+                        record.innerHTML = `
+                            <div class="registro-header" onclick="this.parentElement.classList.toggle('expanded')">
+                                <h2><i class="fa-solid fa-wrench"></i> Clave Pozo: ${escaparHtml(item.mtto_clave_pozo || 'N/A')}</h2>
+                                <div class="header-info">
+                                    <span class="badge-completada">Completada</span>
+                                    <span><i class="fa-solid fa-calendar-check"></i> ${escaparHtml(formatearFechaHora(item.completada_en, '—'))}</span>
+                                    <span><i class="fa-solid fa-user-check"></i> ${escaparHtml(cerradaPor)}</span>
+                                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="contenido-expandible">
+                                <div class="cierre-resumen">
+                                    <div class="detail-group"><span class="detail-label">Fecha de captura</span><span class="detail-value">${escaparHtml(formatearFechaHora(item.mtto_fecha_captura, '—'))}</span></div>
+                                    <div class="detail-group"><span class="detail-label">Completada el</span><span class="detail-value">${escaparHtml(formatearFechaHora(item.completada_en, '—'))}</span></div>
+                                    <div class="detail-group"><span class="detail-label">Completada por</span><span class="detail-value">${escaparHtml(cerradaPor)}</span></div>
+                                    <div class="detail-group"><span class="detail-label">Notas de cierre</span><span class="detail-value" style="font-style:italic;">${escaparHtml(item.notas_cierre || 'Sin notas')}</span></div>
+                                </div>
+                                ${detalleMttoHtml(item)}
+                            </div>`;
+                        contenedor.appendChild(record);
+                    });
+                    filtrarRegistros();
+                })
+                .catch(err => {
+                    console.error('Error al cargar el historial de mantenimiento:', err);
+                    contenedor.innerHTML = mensaje('Hubo un problema al cargar el historial.', 'red');
+                });
+        }
+
+        function cargarPozos() {
+            return fetch(`${API_BASE_URL}/lista_pozos`)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(pozos => {
+                    (pozos || []).forEach(p => {
+                        if (!p.l_poz_clave) return;
+                        const opcion = document.createElement('option');
+                        opcion.value = p.l_poz_clave;
+                        opcion.textContent = `${p.l_poz_clave} — ${p.lp_Nombre || 'Sin nombre'}`;
+                        selectPozo.appendChild(opcion);
+                    });
+                })
+                .catch(err => console.error('Error al cargar pozos:', err));
+        }
+
+        selectPozo.addEventListener('change', cargarHistorial);
+        inputBuscar.addEventListener('input', filtrarRegistros);
+
+        Promise.all([cargarMapaOperadores(), cargarPozos()]).then(([nombres]) => {
+            nombresOperadores = nombres;
+            if (pozoInicial) {
+                if (![...selectPozo.options].some(o => o.value === pozoInicial)) {
+                    const opcion = document.createElement('option');
+                    opcion.value = pozoInicial;
+                    opcion.textContent = pozoInicial;
+                    selectPozo.appendChild(opcion);
+                }
+                selectPozo.value = pozoInicial;
+            }
+            cargarHistorial();
+        });
+    });
+  </script>
+
+</body>
+</html>

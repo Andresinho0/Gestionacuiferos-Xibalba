@@ -856,3 +856,176 @@ function borraPozo(idPozo, alTerminar) {
             });
     });
 }
+
+
+// ==========================================
+// CIERRE E HISTORIAL (OPERACIÓN Y MANTENIMIENTO)
+// ==========================================
+
+// Escapa texto antes de insertarlo en innerHTML
+function escaparHtml(t) {
+    return String(t ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Fecha y hora legible; devuelve `vacio` si no hay valor o no es una fecha válida
+function formatearFechaHora(valor, vacio = 'Sin fecha') {
+    if (!valor) return vacio;
+    const f = new Date(valor);
+    if (isNaN(f)) return vacio;
+    return f.toLocaleString('es-MX', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+}
+
+// Lista de operadores [{ id_o, o_nombre, ... }]; lista vacía si falla
+function cargarOperadores() {
+    return fetch(`${API_BASE_URL}/operadores`)
+        .then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        })
+        .then(lista => Array.isArray(lista) ? lista : [])
+        .catch(error => {
+            console.error('Error al cargar operadores:', error);
+            return [];
+        });
+}
+
+// Mapa { id_o: o_nombre } para mostrar quién cerró un registro
+function cargarMapaOperadores() {
+    return cargarOperadores().then(lista => {
+        const nombres = {};
+        lista.forEach(o => { nombres[o.id_o] = o.o_nombre; });
+        return nombres;
+    });
+}
+
+// Clave primaria de un registro de mantenimiento. En esta entidad el backend la expone
+// como idLp (el pozo se identifica con mtto_clave_pozo), a diferencia de operación,
+// donde idLp es el pozo.
+function idRegistroMtto(item) {
+    return item.idLp ?? item.id_mtto ?? item.id;
+}
+
+// Cierra un registro pendiente. recurso: 'operacion' | 'mantenimiento'.
+// alTerminar se llama cuando la lista debe repintarse (éxito, 409 o 404).
+function completarRegistro(recurso, id, alTerminar) {
+    const refrescar = () => { if (typeof alTerminar === 'function') alTerminar(); };
+
+    if (id === undefined || id === null || id === '' || id === 'N/A') {
+        Swal.fire('Error', 'No se pudo identificar el registro a completar.', 'error');
+        return;
+    }
+
+    cargarOperadores().then(operadores => {
+        if (!operadores.length) {
+            Swal.fire('Error', 'No se pudo cargar la lista de operadores.', 'error');
+            return;
+        }
+
+        const opciones = operadores.map(o =>
+            `<option value="${escaparHtml(o.id_o)}">${escaparHtml(o.o_nombre)}</option>`).join('');
+        const estiloCampo = 'width:100%; box-sizing:border-box; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1; font-family:inherit; margin:6px 0 14px;';
+
+        Swal.fire({
+            title: 'Completar registro',
+            html: `
+                <div style="text-align:left;">
+                    <label for="cierre-operador" style="font-weight:700; color:#004982;">Completada por</label>
+                    <select id="cierre-operador" style="${estiloCampo}">
+                        <option value="">Selecciona un operador…</option>
+                        ${opciones}
+                    </select>
+                    <label for="cierre-notas" style="font-weight:700; color:#004982;">Notas de cierre (opcional)</label>
+                    <textarea id="cierre-notas" rows="4" style="${estiloCampo} resize:vertical;"></textarea>
+                </div>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Completar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#28a745',
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading(),
+            preConfirm: () => {
+                const idOperador = document.getElementById('cierre-operador').value;
+                const notas = document.getElementById('cierre-notas').value.trim();
+                if (!idOperador) {
+                    Swal.showValidationMessage('Selecciona el operador que completó el registro.');
+                    return false;
+                }
+                return fetch(`${API_BASE_URL}/${recurso}/${encodeURIComponent(id)}/completar`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completada_por: Number(idOperador), notas_cierre: notas })
+                })
+                .then(r => ({ status: r.status, ok: r.ok }))
+                .catch(error => {
+                    console.error('Error al completar el registro:', error);
+                    Swal.showValidationMessage('No se pudo conectar con el servidor.');
+                    return false;
+                });
+            }
+        }).then(result => {
+            const respuesta = result.value;
+            if (!respuesta) return; // cancelado
+
+            if (respuesta.ok) {
+                Swal.fire({ icon: 'success', title: 'Registro completado', timer: 1500, showConfirmButton: false })
+                    .then(refrescar);
+            } else if (respuesta.status === 409) {
+                Swal.fire('Ya completado', 'Este registro ya estaba completado.', 'info').then(refrescar);
+            } else if (respuesta.status === 404) {
+                Swal.fire('No encontrado', 'El registro ya no existe.', 'warning').then(refrescar);
+            } else {
+                Swal.fire('Error', `No se pudo completar el registro (HTTP ${respuesta.status}).`, 'error');
+            }
+        });
+    });
+}
+
+// Tarjetas de detalle de un mantenimiento (usadas en pendientes e historial)
+function detalleMttoHtml(item) {
+    const v = (valor, defecto = '-') =>
+        escaparHtml(valor === undefined || valor === null || valor === '' ? defecto : valor);
+    const grupo = (etiqueta, contenido, estilo = '') =>
+        `<div class="detail-group"><span class="detail-label">${etiqueta}</span><span class="detail-value"${estilo ? ` style="${estilo}"` : ''}>${contenido}</span></div>`;
+
+    return `
+        <div class="cards-grid">
+            <div class="tarjeta">
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-gear"></i> 1. Motor</h3>
+                ${grupo('Tipo', v(item.mtto_motor_tipo))}
+                ${grupo('Potencia (HP / KW)', `${v(item.mtto_motor_hp, '0')} HP / ${v(item.mtto_motor_kw, '0')} KW`)}
+                ${grupo('Eficiencia', `${v(item.mtto_motor_eficiencia, '0')}%`)}
+                ${grupo('Bomba (Marca)', v(item.mtto_bomba_marca))}
+                ${grupo('Bomba (Gasto / RPM / HP)', `${v(item.mtto_bomba_lps)} L/s / ${v(item.mtto_bomba_rpm)} RPM / ${v(item.mtto_bomba_hp)} HP`)}
+            </div>
+
+            <div class="tarjeta">
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
+                ${grupo('Tablero (Tipo / Cap.)', `${v(item.mtto_tablero_tipo)} / ${v(item.mtto_tablero_capacidad, '0')} A`)}
+                ${grupo('Tablero (Marca / HP / Voltaje)', `${v(item.mtto_tablero_marca)} / ${v(item.mtto_tablero_hp)} HP / ${v(item.mtto_tablero_voltaje)} V`)}
+                ${grupo('Transformador (Marca / Cap.)', `${v(item.mtto_transformador_marca || item.mtto_transformador_tipo)} / ${v(item.mtto_transformador_capacidad, '0')} kVA`)}
+                ${grupo('Transformador Seco', v(item.mtto_trans_seco))}
+                ${grupo('Panel Solar / Baterías', `${v(item.mtto_panel_solar)} / ${v(item.mtto_banco_baterias)}`)}
+                ${grupo('Sistema de Tierras', v(item.mtto_sistema_tierras))}
+            </div>
+
+            <div class="tarjeta">
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Medidores y Tubería</h3>
+                ${grupo('Medidores (Presión / Flujo)', `${v(item.mtto_medidor_presion, '0')} kg/cm² / ${v(item.mtto_medidor_flujo, '0')} L/s`)}
+                ${grupo('Medidores N.E. / N.D.', `${v(item.mtto_medidor_NE)} / ${v(item.mtto_medidor_ND)}`)}
+                ${grupo('Tubería (Diámetro / Longitud)', `${v(item.mtto_tuberia_diametro, '0')} in / ${v(item.mtto_tuberia_longitud, '0')} m`)}
+                ${grupo('Poliducto / Sanitaria', `${v(item.mtto_poliducto)} / ${v(item.mtto_sanitaria)}`)}
+            </div>
+
+            <div class="tarjeta">
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 4. Cableado y Notas</h3>
+                ${grupo('Cable Transformador-Arrancador', `Tipo: ${v(item.mtto_cable_transformador)} | Cal: ${v(item.mtto_calibre_arrancador)} | ${v(item.mtto_longitud_arrancador, '0')}m`)}
+                ${grupo('Cable Arrancador-Bomba', `Tipo: ${v(item.mtto_cable_bomba)} | Cal: ${v(item.mtto_calibre_bomba)} | ${v(item.mtto_longitud_bomba, '0')}m`)}
+                ${grupo('Observaciones', v(item.mtto_observaciones, 'Ninguna'), 'font-style:italic;')}
+            </div>
+        </div>`;
+}
