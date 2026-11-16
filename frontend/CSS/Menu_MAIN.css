@@ -679,6 +679,25 @@ footer small {
 }
 
 
+  .search-container {
+  width: 52.5%;
+  margin: 20px auto;
+  text-align: center;
+  background: #fff;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.search-container input {
+  width: 60%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  outline: none;
+}
+
 /* ==========================================
   9. RESPONSIVE
    ========================================== */

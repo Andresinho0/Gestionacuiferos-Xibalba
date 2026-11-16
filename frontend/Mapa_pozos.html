@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Pozos - XibalbaData</title>
+
+  <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+  <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+  <script src="js/script.js" defer></script>
+
+  <style>
+    #mapa-pozos {
+      width: 100%;
+      height: 70vh;
+      min-height: 420px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    #mapa-estado {
+      text-align: center;
+      margin: 10px 0;
+      color: #e4e6e9;
+    }
+    #mapa-aviso {
+      display: none;
+      margin: 10px auto;
+      padding: 8px 14px;
+      max-width: 600px;
+      text-align: center;
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      border-radius: 8px;
+      color: #9a3412;
+    }
+    .mapboxgl-popup-content {
+      padding: 14px 18px;
+      background: #ffffff;
+      color: #1e293b;
+      border-radius: 10px;
+      border-top: 4px solid #004982;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+      font-family: inherit;
+      font-size: 14px;
+      min-width: 150px;
+    }
+    .mapboxgl-popup-close-button {
+      font-size: 18px;
+      padding: 2px 8px;
+      color: #64748b;
+    }
+    .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip { border-top-color: #ffffff; }
+    .popup-pozo a {
+      display: inline-block;
+      margin-top: 6px;
+      color: #004982;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-content">
+    <div id="header-container"></div>
+
+    <h1 class="main-title">Mapa de pozos</h1>
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Ubicación de los pozos</h2>
+        <div class="panel-actions">
+          <a href="Listado_pozos.html" class="add-btn">
+            <i class="fa-solid fa-list"></i> Ver listado
+          </a>
+        </div>
+      </div>
+
+      <div id="mapa-estado">Cargando pozos...</div>
+      <div id="mapa-aviso"></div>
+      <div id="mapa-pozos"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Parseo de ubicación (mismo formato que Detalles_pozo.html) ---
+    function dmsADecimal(texto) {
+      const nums = texto.match(/\d+(?:\.\d+)?/g);
+      if (!nums) return NaN;
+      const [g, m = 0, s = 0] = nums.map(Number);
+      if (m >= 60 || s >= 60) return NaN;
+      const signo = /[-−SWO]/i.test(texto) ? -1 : 1;
+      return signo * (g + m / 60 + s / 3600);
+    }
+
+    // '19° 37\' 12.284"/-99° 46\' 38.712"' -> { lat, lng } o null
+    function parsearUbicacion(texto) {
+      if (!texto || typeof texto !== 'string') return null;
+      const partes = texto.split('/');
+      if (partes.length !== 2) return null;
+      const lat = dmsADecimal(partes[0]);
+      const lng = dmsADecimal(partes[1]);
+      if (isNaN(lat) || isNaN(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+      return { lat, lng };
+    }
+
+    function escapar(texto) {
+      const d = document.createElement('div');
+      d.textContent = texto == null ? '' : String(texto);
+      return d.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const estado = document.getElementById('mapa-estado');
+      const aviso = document.getElementById('mapa-aviso');
+
+      if (typeof mapboxgl === 'undefined') {
+        estado.textContent = 'No se pudo cargar Mapbox.';
+        return;
+      }
+
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      const map = new mapboxgl.Map({
+        container: 'mapa-pozos',
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        center: [-99.5, 20.0],    // zona centro de México [lng, lat]
+        zoom: 8
+      });
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.on('load', () => map.resize());
+
+      fetch(`${API_BASE_URL}/lista_pozos`)
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(pozos => {
+          pozos = pozos || [];
+          const bounds = new mapboxgl.LngLatBounds();
+          let validos = 0, invalidos = 0;
+
+          pozos.forEach(p => {
+            const coords = parsearUbicacion(p.lp_ubicacion);
+            if (!coords) { invalidos++; return; }
+
+            const lngLat = [coords.lng, coords.lat];   // Mapbox: [lng, lat]
+            const nombre = p.lp_Nombre || p.l_poz_clave || 'Pozo';
+            const html = `
+              <div class="popup-pozo">
+                <strong>${escapar(nombre)}</strong><br>
+                <a href="Detalles_pozo.html?id=${encodeURIComponent(p.id_lp)}">Ver detalles</a>
+              </div>`;
+
+            new mapboxgl.Marker({ color: '#004982' })
+              .setLngLat(lngLat)
+              .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(html))
+              .addTo(map);
+
+            bounds.extend(lngLat);
+            validos++;
+          });
+
+          estado.textContent = `${validos} pozo${validos === 1 ? '' : 's'} en el mapa`;
+          if (invalidos > 0) {
+            aviso.textContent = `${invalidos} pozo${invalidos === 1 ? '' : 's'} sin ubicación válida`;
+            aviso.style.display = 'block';
+          }
+
+          // Vista inicial fija en la zona centro (sin fitBounds)
+          if (map.loaded()) map.resize(); else map.once('load', () => map.resize());
+        })
+        .catch(err => {
+          console.error('Error al cargar los pozos:', err);
+          estado.textContent = 'No se pudo cargar el listado de pozos.';
+        });
+    });
+  </script>
+</body>
+</html>
