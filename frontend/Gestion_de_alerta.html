@@ -31,10 +31,16 @@
       
       <div class="panel-header">
         <h2>Alertas recibidas</h2>
-        <a href="Agregar_nueva_alerta.html" class="add-btn">
-          <i class="fa-solid fa-square-plus"></i>
-          Capturar nueva alerta
-        </a>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <a href="Agregar_nueva_alerta.html" class="add-btn">
+            <i class="fa-solid fa-square-plus"></i>
+            Capturar nueva alerta
+          </a>
+          <a href="Historial_alertas.html" class="add-btn">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Historial de alertas
+          </a>
+        </div>
       </div>
 
       <div class="table-scroll">
@@ -85,62 +91,65 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const baseUrl = typeof API_BASE_URL !== 'undefined'
-            ? API_BASE_URL
-            : 'https://xibalbadata-java-production.up.railway.app/api';
         const tbody = document.getElementById('tabla-alertas');
+        const filaMensaje = (texto) => `<tr><td colspan="7">${texto}</td></tr>`;
 
-        const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
-            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-        const getJson = (endpoint) => fetch(`${baseUrl}/${endpoint}`).then(r => {
+        const getJson = (endpoint) => fetch(`${API_BASE_URL}/${endpoint}`).then(r => {
             if (!r.ok) throw new Error(`HTTP ${r.status}`);
             return r.json();
         });
 
-        Promise.all([
-            getJson('alertas_pozos'),
-            getJson('operadores').catch(() => [])
-        ]).then(([alertas, operadores]) => {
-            const nombres = {};
-            operadores.forEach(o => { nombres[o.id_o] = o.o_nombre; });
+        // Solo se muestran las alertas pendientes; las resueltas pasan a Historial_alertas.html
+        function cargarAlertas() {
+            tbody.innerHTML = filaMensaje('Cargando alertas...');
 
-            if (!alertas.length) {
-                tbody.innerHTML = '<tr><td colspan="7">No hay alertas registradas.</td></tr>';
-                return;
-            }
+            Promise.all([
+                getJson('alertas_pozos/pendientes'),
+                cargarMapaOperadores()
+            ]).then(([alertas, nombres]) => {
+                if (!alertas || !alertas.length) {
+                    tbody.innerHTML = filaMensaje('No hay alertas pendientes.');
+                    return;
+                }
 
-            tbody.innerHTML = '';
-            alertas.forEach(al => {
-                const id = al.id_al ?? '';
-                const fecha = al.al_fechacap ? new Date(al.al_fechacap).toLocaleString('es-MX') : '';
-                const operador = nombres[al.al_operador] ?? al.al_operador ?? '';
-                const fila = document.createElement('tr');
-                fila.dataset.alertaId = id;
-                // La columna "Alerta resuelta" se conserva: más adelante sus acciones
-                // moverán la alerta a un historial (archivo por crear). data-alerta-id
-                // deja listo el identificador para eso.
-                fila.innerHTML = `
-                    <td>${esc(id)}</td>
-                    <td>${esc(al.al_clave_de_pozo)}</td>
-                    <td>${esc(al.al_tipo_de_alerta)}</td>
-                    <td>${esc(fecha)}</td>
-                    <td>${esc(operador)}</td>
-                    <td>${esc(al.al_comentarios)}</td>
-                    <td>
-                        <a href="#" onclick="confirmacion3()" data-alerta-id="${esc(id)}" title="Aceptar" style="margin-right: 12px;">
-                          <i class="fa-solid fa-square-check action-icon" style="color: #28a745; font-size: 1.3rem;"></i>
-                        </a>
-                        <a href="Alerta_no_resuelta.html" data-alerta-id="${esc(id)}" title="Cancelar">
-                          <i class="fa-solid fa-delete-left action-icon" style="color: #dc3545; font-size: 1.3rem;"></i>
-                        </a>
-                    </td>`;
-                tbody.appendChild(fila);
+                tbody.innerHTML = '';
+                alertas.forEach(al => {
+                    const id = al.id_al ?? '';
+                    const operador = nombres[al.al_operador] ?? al.al_operador ?? '';
+                    const fila = document.createElement('tr');
+                    fila.dataset.alertaId = id;
+                    fila.innerHTML = `
+                        <td>${escaparHtml(id)}</td>
+                        <td>${escaparHtml(al.al_clave_de_pozo)}</td>
+                        <td>${escaparHtml(al.al_tipo_de_alerta)}</td>
+                        <td>${escaparHtml(formatearFechaHora(al.al_fechacap, ''))}</td>
+                        <td>${escaparHtml(operador)}</td>
+                        <td>${escaparHtml(al.al_comentarios)}</td>
+                        <td>
+                            <a href="#" class="btn-resolver" data-alerta-id="${escaparHtml(id)}" title="Marcar como resuelta" style="margin-right: 12px;">
+                              <i class="fa-solid fa-square-check action-icon" style="color: #28a745; font-size: 1.3rem;"></i>
+                            </a>
+                            <a href="Alerta_no_resuelta.html" data-alerta-id="${escaparHtml(id)}" title="Alerta no resuelta">
+                              <i class="fa-solid fa-delete-left action-icon" style="color: #dc3545; font-size: 1.3rem;"></i>
+                            </a>
+                        </td>`;
+                    tbody.appendChild(fila);
+                });
+            }).catch(err => {
+                console.error('Error al cargar alertas:', err);
+                tbody.innerHTML = filaMensaje('Error al cargar las alertas.');
             });
-        }).catch(err => {
-            console.error('Error al cargar alertas:', err);
-            tbody.innerHTML = '<tr><td colspan="7">Error al cargar las alertas.</td></tr>';
+        }
+
+        // Botón verde: confirma la resolución (operador + notas) y repinta la tabla
+        tbody.addEventListener('click', function(e) {
+            const boton = e.target.closest('.btn-resolver');
+            if (!boton) return;
+            e.preventDefault();
+            confirmacion3(boton.dataset.alertaId, cargarAlertas);
         });
+
+        cargarAlertas();
     });
   </script>
 

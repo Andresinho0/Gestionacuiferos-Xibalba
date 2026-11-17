@@ -159,7 +159,15 @@ function mostrarAlerta(titulo, icono = 'info', temporizador = null) {
 const saludos = () => mostrarAlerta('Datos enviados y en espera, la confirmación puede tardar entre uno y tres días hábiles');
 const confirmacion = () => mostrarAlerta('Datos enviados para almacenamiento', 'success', 2500);
 const confirmacion2 = () => mostrarAlerta('Datos enviados y en espera, la confirmación puede tardar entre uno y tres días hábiles', 'success', 2500);
-const confirmacion3 = () => mostrarAlerta('Alerta Resuelta', 'success', 2500);
+// Marca una alerta como resuelta (PUT /alertas_pozos/{id}/completar) y la pasa al historial
+const confirmacion3 = (id, alTerminar) => completarRegistro('alertas_pozos', id, alTerminar, {
+    titulo: 'Resolver alerta',
+    confirmar: 'Marcar como resuelta',
+    etiquetaOperador: 'Resuelta por',
+    exito: 'Alerta resuelta',
+    yaCompletado: 'Esta alerta ya estaba marcada como resuelta.',
+    noEncontrado: 'La alerta ya no existe.'
+});
 const modificaciondatos = () => mostrarAlerta('Datos modificados con exito', 'success', 2500);
 const notfoperadorr = () => {
     mostrarAlerta('Se envio una notificación al operador', 'success', 3000);
@@ -909,9 +917,18 @@ function idRegistroMtto(item) {
     return item.idLp ?? item.id_mtto ?? item.id;
 }
 
-// Cierra un registro pendiente. recurso: 'operacion' | 'mantenimiento'.
+// Cierra un registro pendiente. recurso: 'operacion' | 'mantenimiento' | 'alertas_pozos'.
 // alTerminar se llama cuando la lista debe repintarse (éxito, 409 o 404).
-function completarRegistro(recurso, id, alTerminar) {
+// textos permite personalizar los mensajes del diálogo (opcional).
+function completarRegistro(recurso, id, alTerminar, textos = {}) {
+    const t = Object.assign({
+        titulo: 'Completar registro',
+        confirmar: 'Completar',
+        etiquetaOperador: 'Completada por',
+        exito: 'Registro completado',
+        yaCompletado: 'Este registro ya estaba completado.',
+        noEncontrado: 'El registro ya no existe.'
+    }, textos);
     const refrescar = () => { if (typeof alTerminar === 'function') alTerminar(); };
 
     if (id === undefined || id === null || id === '' || id === 'N/A') {
@@ -930,10 +947,10 @@ function completarRegistro(recurso, id, alTerminar) {
         const estiloCampo = 'width:100%; box-sizing:border-box; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1; font-family:inherit; margin:6px 0 14px;';
 
         Swal.fire({
-            title: 'Completar registro',
+            title: t.titulo,
             html: `
                 <div style="text-align:left;">
-                    <label for="cierre-operador" style="font-weight:700; color:#004982;">Completada por</label>
+                    <label for="cierre-operador" style="font-weight:700; color:#004982;">${escaparHtml(t.etiquetaOperador)}</label>
                     <select id="cierre-operador" style="${estiloCampo}">
                         <option value="">Selecciona un operador…</option>
                         ${opciones}
@@ -943,7 +960,7 @@ function completarRegistro(recurso, id, alTerminar) {
                 </div>`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Completar',
+            confirmButtonText: t.confirmar,
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#28a745',
             showLoaderOnConfirm: true,
@@ -952,7 +969,7 @@ function completarRegistro(recurso, id, alTerminar) {
                 const idOperador = document.getElementById('cierre-operador').value;
                 const notas = document.getElementById('cierre-notas').value.trim();
                 if (!idOperador) {
-                    Swal.showValidationMessage('Selecciona el operador que completó el registro.');
+                    Swal.showValidationMessage('Selecciona el operador que cerró el registro.');
                     return false;
                 }
                 return fetch(`${API_BASE_URL}/${recurso}/${encodeURIComponent(id)}/completar`, {
@@ -972,12 +989,12 @@ function completarRegistro(recurso, id, alTerminar) {
             if (!respuesta) return; // cancelado
 
             if (respuesta.ok) {
-                Swal.fire({ icon: 'success', title: 'Registro completado', timer: 1500, showConfirmButton: false })
+                Swal.fire({ icon: 'success', title: t.exito, timer: 1500, showConfirmButton: false })
                     .then(refrescar);
             } else if (respuesta.status === 409) {
-                Swal.fire('Ya completado', 'Este registro ya estaba completado.', 'info').then(refrescar);
+                Swal.fire('Ya completado', t.yaCompletado, 'info').then(refrescar);
             } else if (respuesta.status === 404) {
-                Swal.fire('No encontrado', 'El registro ya no existe.', 'warning').then(refrescar);
+                Swal.fire('No encontrado', t.noEncontrado, 'warning').then(refrescar);
             } else {
                 Swal.fire('Error', `No se pudo completar el registro (HTTP ${respuesta.status}).`, 'error');
             }

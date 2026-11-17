@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Alertas - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
+    <script src="js/script.js" defer></script>
+    <style>
+      .table-scroll { width: 100%; overflow-x: auto; }
+      .tabla { min-width: 1200px; }
+      .tabla thead th, .tabla tbody td { padding: 14px 16px; }
+      .tabla tbody td:nth-child(4), .tabla tbody td:nth-child(7) { white-space: nowrap; } /* fechas en una línea */
+
+      .filtros {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          align-items: center;
+          justify-content: center;
+          background: #fff;
+          padding: 6px;
+          margin: 20px auto;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .filtros label { font-weight: bold; color: #004982; margin-right: 6px; }
+
+      .filtros select, .filtros input {
+          padding: 8px 12px;
+          border-radius: 6px;
+          border: 1px solid #cbd5e1;
+          font-family: inherit;
+          outline: none;
+          min-width: 220px;
+      }
+    </style>
+</head>
+<body>
+
+  <div class="page-content">
+
+    <div id="header-container"></div>
+
+    <h1 class="main-title">Historial de alertas</h1>
+
+    <div class="panel">
+
+      <div class="panel-header">
+        <h2>Alertas resueltas</h2>
+        <a href="Gestion_de_alerta.html" class="add-btn">
+          <i class="fa-solid fa-list-check"></i>
+          Ver pendientes
+        </a>
+      </div>
+
+      <div class="filtros">
+        <div>
+          <label for="filtroPozo">Pozo:</label>
+          <select id="filtroPozo">
+            <option value="">Todos los pozos</option>
+          </select>
+        </div>
+        <div>
+          <label for="filtroGeneral">Buscar:</label>
+          <input type="text" id="filtroGeneral" placeholder="Tipo, operador, notas...">
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="tabla">
+          <colgroup>
+            <col width="5%">
+            <col width="9%">
+            <col width="11%">
+            <col width="12%">
+            <col width="11%">
+            <col width="16%">
+            <col width="12%">
+            <col width="11%">
+            <col width="13%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Clave de pozo</th>
+              <th>Tipo de alerta</th>
+              <th>Fecha de alerta</th>
+              <th>Reportada por</th>
+              <th>Observaciones</th>
+              <th>Resuelta el</th>
+              <th>Resuelta por</th>
+              <th>Notas de cierre</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-historial">
+            <tr><td colspan="9">Cargando historial...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="button-container1">
+        <button class="btn" onclick="menumain()" id="backBtn">
+            <i class="fa-solid fa-arrow-left"></i>
+            Regresar
+        </button>
+      </div>
+
+    </div> <!-- /.panel -->
+
+  </div> <!-- /.page-content -->
+
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i>
+      Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const tbody = document.getElementById('tabla-historial');
+        const selectPozo = document.getElementById('filtroPozo');
+        const inputBuscar = document.getElementById('filtroGeneral');
+        const pozoInicial = new URLSearchParams(window.location.search).get('pozo') || '';
+
+        let nombresOperadores = {};
+
+        const filaMensaje = (texto) => `<tr><td colspan="9">${texto}</td></tr>`;
+
+        function filtrarFilas() {
+            const filtro = inputBuscar.value.toLowerCase();
+            tbody.querySelectorAll('tr[data-registro]').forEach(fila => {
+                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? '' : 'none';
+            });
+        }
+
+        function cargarHistorial() {
+            const clave = selectPozo.value;
+            // /alertas_pozos/historial/pozo/{id} espera el id numérico del pozo, pero las alertas
+            // solo traen la clave (al_clave_de_pozo; idLp llega en 0). Por eso se pide el
+            // historial completo y se filtra por clave aquí.
+            const url = `${API_BASE_URL}/alertas_pozos/historial`;
+
+            tbody.innerHTML = filaMensaje('Cargando historial...');
+
+            fetch(url)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(todos => {
+                    const registros = (todos || []).filter(al => !clave || al.al_clave_de_pozo === clave);
+                    if (!registros.length) {
+                        tbody.innerHTML = filaMensaje(clave
+                            ? 'Este pozo no tiene alertas resueltas.'
+                            : 'No hay alertas resueltas.');
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    registros.forEach(al => {
+                        const id = al.id_al ?? '';
+                        const reportadaPor = nombresOperadores[al.al_operador] ?? al.al_operador ?? '—';
+                        const resueltaPor = nombresOperadores[al.completada_por] ?? al.completada_por ?? '—';
+                        const fila = document.createElement('tr');
+                        fila.dataset.registro = id;
+                        fila.innerHTML = `
+                            <td>${escaparHtml(id)}</td>
+                            <td>${escaparHtml(al.al_clave_de_pozo || '—')}</td>
+                            <td>${escaparHtml(al.al_tipo_de_alerta || '—')}</td>
+                            <td>${escaparHtml(formatearFechaHora(al.al_fechacap, '—'))}</td>
+                            <td>${escaparHtml(reportadaPor)}</td>
+                            <td>${escaparHtml(al.al_comentarios || '—')}</td>
+                            <td>${escaparHtml(formatearFechaHora(al.completada_en, '—'))}</td>
+                            <td>${escaparHtml(resueltaPor)}</td>
+                            <td style="font-style: italic;">${escaparHtml(al.notas_cierre || 'Sin notas')}</td>`;
+                        tbody.appendChild(fila);
+                    });
+                    filtrarFilas();
+                })
+                .catch(err => {
+                    console.error('Error al cargar el historial de alertas:', err);
+                    tbody.innerHTML = filaMensaje('Error al cargar el historial.');
+                });
+        }
+
+        function cargarPozos() {
+            return fetch(`${API_BASE_URL}/lista_pozos`)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(pozos => {
+                    (pozos || []).forEach(p => {
+                        if (!p.l_poz_clave) return;
+                        const opcion = document.createElement('option');
+                        opcion.value = p.l_poz_clave;
+                        opcion.textContent = `${p.l_poz_clave} — ${p.lp_Nombre || 'Sin nombre'}`;
+                        selectPozo.appendChild(opcion);
+                    });
+                })
+                .catch(err => console.error('Error al cargar pozos:', err));
+        }
+
+        selectPozo.addEventListener('change', cargarHistorial);
+        inputBuscar.addEventListener('input', filtrarFilas);
+
+        Promise.all([cargarMapaOperadores(), cargarPozos()]).then(([nombres]) => {
+            nombresOperadores = nombres;
+            if (pozoInicial) {
+                if (![...selectPozo.options].some(o => o.value === pozoInicial)) {
+                    const opcion = document.createElement('option');
+                    opcion.value = pozoInicial;
+                    opcion.textContent = pozoInicial;
+                    selectPozo.appendChild(opcion);
+                }
+                selectPozo.value = pozoInicial;
+            }
+            cargarHistorial();
+        });
+    });
+  </script>
+
+</body>
+</html>
