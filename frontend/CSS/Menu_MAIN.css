@@ -212,6 +212,44 @@ footer small {
   background-color: #f9fbfd;
 }
 
+.notification-btn {
+  position: relative;
+}
+
+.notification-dropdown#notificationDropdown {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+a.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-decoration: none;
+}
+
+a.notification-item > i {
+  color: #004982;
+  margin-top: 3px;
+}
+
+.notification-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.notification-item.unread {
+  background-color: #eef5fc;
+  font-weight: 600;
+}
+
+.notification-empty {
+  color: #64748b;
+  text-align: center;
+}
+
 /* ==========================================
    4. ESTRUCTURA Y TARJETAS
    ========================================== */

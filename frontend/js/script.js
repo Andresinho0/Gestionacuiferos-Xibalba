@@ -702,10 +702,125 @@ window.onclick = function(event) {
 // LÓGICA DE NOTIFICACIONES (Menu_MAIN)
 // ==========================================
 
+const NOTIF_MAX = 15; // Cuántas notificaciones mostrar en el buzón
+const NOTIF_CLAVE_VISTA = 'notif_ultima_vista'; // Marca de tiempo de la última vez que se abrió el buzón
+
+function leerUltimaVista() {
+  try { return Number(localStorage.getItem(NOTIF_CLAVE_VISTA)) || 0; } catch (e) { return 0; }
+}
+
+function guardarUltimaVista(ms) {
+  try { localStorage.setItem(NOTIF_CLAVE_VISTA, String(ms)); } catch (e) { /* sin almacenamiento */ }
+}
+
+// GET que devuelve [] si falla, para que una lista caída no rompa el buzón
+function obtenerLista(ruta) {
+  return fetch(`${API_BASE_URL}/${ruta}`)
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(lista => Array.isArray(lista) ? lista : [])
+    .catch(error => {
+      console.error(`Error al cargar notificaciones (${ruta}):`, error);
+      return [];
+    });
+}
+
+// Construye las notificaciones a partir de los registros de mantenimiento y operación
+function cargarNotificaciones() {
+  const dropdown = document.getElementById('notificationDropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = '<div class="notification-item notification-empty">Cargando...</div>';
+
+  // Solo se consultan los registros pendientes: al completarse salen de estas listas
+  // y por lo tanto desaparecen del buzón.
+  Promise.all([
+    obtenerLista('mantenimiento/pendientes').then(l => l.map(item => ({
+      texto: `Nuevo mantenimiento - ${item.mtto_clave_pozo || 'N/A'}`,
+      fecha: item.mtto_fecha_captura,
+      icono: 'fa-wrench',
+      enlace: 'tabla_mantenimiento.html'
+    }))),
+    obtenerLista('operacion/pendientes').then(l => l.map(op => {
+      const id = op.id_op ?? op.id;
+      return {
+        texto: `Nueva operación - ${op.op_cpozo || 'N/A'}`,
+        fecha: op.op_fecha_captura,
+        icono: 'fa-gauge-high',
+        enlace: id != null ? `Registro_operacion.html?id=${encodeURIComponent(id)}` : 'Gestion_de_Operacion.html'
+      };
+    }))
+  ]).then(grupos => {
+    const notificaciones = grupos.flat()
+      .map(n => ({ ...n, ms: new Date(n.fecha).getTime() || 0 }))
+      .sort((a, b) => b.ms - a.ms)
+      .slice(0, NOTIF_MAX);
+
+    pintarNotificaciones(notificaciones);
+  });
+}
+
+function pintarNotificaciones(notificaciones) {
+  const dropdown = document.getElementById('notificationDropdown');
+  if (!dropdown) return;
+
+  const ultimaVista = leerUltimaVista();
+  const nuevas = notificaciones.filter(n => n.ms > ultimaVista).length;
+  actualizarContadorNotificaciones(nuevas);
+
+  // Guardamos la fecha más reciente para marcar como leídas al abrir el buzón
+  dropdown.dataset.masReciente = notificaciones.length ? String(notificaciones[0].ms) : '0';
+
+  if (!notificaciones.length) {
+    dropdown.innerHTML = '<div class="notification-item notification-empty">No hay notificaciones.</div>';
+    return;
+  }
+
+  dropdown.innerHTML = notificaciones.map(n => `
+    <a class="notification-item${n.ms > ultimaVista ? ' unread' : ''}" href="${escaparHtml(n.enlace)}">
+      <i class="fa-solid ${n.icono}"></i>
+      <span class="notification-text">
+        ${escaparHtml(n.texto)}
+        <small>${escaparHtml(formatearFechaHora(n.fecha))}</small>
+      </span>
+    </a>`).join('');
+}
+
+function actualizarContadorNotificaciones(cantidad) {
+  const boton = document.querySelector('.notification-btn[onclick="toggleNotifications()"]');
+  if (!boton) return;
+
+  let badge = boton.querySelector('.notification-count');
+  if (cantidad <= 0) {
+    if (badge) badge.remove();
+    return;
+  }
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'notification-count';
+    boton.appendChild(badge);
+  }
+  badge.textContent = cantidad > 9 ? '9+' : String(cantidad);
+}
+
 function toggleNotifications() {
   const dropdown = document.getElementById('notificationDropdown');
   if (dropdown) {
-    dropdown.classList.toggle('active'); 
+    dropdown.classList.toggle('active');
+    // Cierra el perfil de usuario para mostrar solo uno a la vez
+    const userDropdown = document.getElementById('userProfileDropdown');
+    if (userDropdown) userDropdown.classList.remove('active');
+
+    // Al abrir el buzón, todo lo mostrado se considera leído
+    if (dropdown.classList.contains('active')) {
+      const masReciente = Number(dropdown.dataset.masReciente) || 0;
+      if (masReciente > leerUltimaVista()) guardarUltimaVista(masReciente);
+      actualizarContadorNotificaciones(0);
+    } else {
+      dropdown.querySelectorAll('.notification-item.unread').forEach(el => el.classList.remove('unread'));
+    }
   }
 }
 
@@ -735,8 +850,12 @@ document.addEventListener("DOMContentLoaded", function() {
       })
       .then(html => {
         headerContainer.innerHTML = html;
+        cargarNotificaciones();
       })
       .catch(error => console.error("Error:", error));
+  } else {
+    // Páginas con el header escrito directamente en el HTML
+    cargarNotificaciones();
   }
 });
 
@@ -749,7 +868,10 @@ function toggleUserProfile() {
   const dropdown = document.getElementById('userProfileDropdown');
   if (dropdown) {
     dropdown.classList.toggle('active');
-    
+    // Cierra las notificaciones para mostrar solo uno a la vez
+    const notifDropdown = document.getElementById('notificationDropdown');
+    if (notifDropdown) notifDropdown.classList.remove('active');
+
     // Si se abre el menú, inyecta los datos de la sesión actual
     if (dropdown.classList.contains('active')) {
       document.getElementById('display-nombre').textContent = localStorage.getItem('usuario_nombre') || 'N/A';
@@ -929,7 +1051,11 @@ function completarRegistro(recurso, id, alTerminar, textos = {}) {
         yaCompletado: 'Este registro ya estaba completado.',
         noEncontrado: 'El registro ya no existe.'
     }, textos);
-    const refrescar = () => { if (typeof alTerminar === 'function') alTerminar(); };
+    const refrescar = () => {
+        if (typeof alTerminar === 'function') alTerminar();
+        // El registro ya no está pendiente: se quita del buzón sin recargar la página
+        cargarNotificaciones();
+    };
 
     if (id === undefined || id === null || id === '' || id === 'N/A') {
         Swal.fire('Error', 'No se pudo identificar el registro a completar.', 'error');
