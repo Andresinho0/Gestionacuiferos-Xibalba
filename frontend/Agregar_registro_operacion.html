@@ -9,6 +9,7 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script>
     <script src="js/script.js" defer></script>
+    <script src="js/select-buscable.js"></script>
 </head>
 <body>
 
@@ -132,6 +133,7 @@
         const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
 
         // 1. Cargar lista de pozos
+        hacerSelectBuscable('dropdown', { placeholder: 'Escribe la clave del pozo...' });
         fetch(`${baseUrl}/lista_pozos`)
             .then(response => response.json())
             .then(data => {

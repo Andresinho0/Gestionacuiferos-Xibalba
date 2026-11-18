@@ -10,6 +10,7 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
+    <script src="js/select-buscable.js"></script>
 
     <style>
         /* Tarjeta principal (pozo y fecha): pequeña, centrada y arriba */
@@ -454,6 +455,7 @@
         // Dropdown de pozos: el valor de cada opción es la clave del pozo
         const baseUrlPozos = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
         const dropdown = document.getElementById('dropdown');
+        hacerSelectBuscable(dropdown, { placeholder: 'Escribe la clave o nombre del pozo...' });
         fetch(`${baseUrlPozos}/lista_pozos`)
             .then(response => {
                 if (!response.ok) throw new Error('No se pudo cargar el listado de pozos.');

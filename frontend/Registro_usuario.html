@@ -35,7 +35,7 @@
       </div>
 
       <!-- Formulario estructurado en CSS Grid (2 columnas) -->
-      <form class="form-grid" id="registroForm" onsubmit="event.preventDefault(); crearcuenta();">
+      <form class="form-grid" id="registroForm" onsubmit="event.preventDefault(); registrarConVerificacion();">
         
         <div class="form-group">
           <label for="matricula">Matrícula</label>
@@ -49,7 +49,8 @@
 
         <div class="form-group">
           <label for="correo">Correo Electrónico</label>
-          <input type="email" id="correo" name="email" required placeholder="ejemplo@dominio.com">
+          <input type="email" id="correo" name="email" required placeholder="ejemplo@dominio.com" autocomplete="email">
+          <small id="correoEstado" style="display:block; margin-top:6px; min-height:1em; font-size:0.85em;"></small>
         </div>
 
         <div class="form-group">
@@ -100,7 +101,7 @@
         <button type="button" class="btn " onclick="window.history.back()" id="backBtn">
           <i class="fa-solid fa-arrow-left"></i> Cancelar
         </button>
-        <button type="button" class="btn" onclick="crearcuenta()" id="saveBtn">
+        <button type="button" class="btn" onclick="registrarConVerificacion()" id="saveBtn">
           <i class="fa-solid fa-user-check"></i> Crear Cuenta
         </button>
       </div>
@@ -158,7 +159,178 @@
             .catch(() => {
                 document.getElementById("oodd").innerHTML = '<option value="">Sin datos de organismo</option>';
             });
+
+        // Verificar el correo cuando el usuario sale del campo
+        const correoInput = document.getElementById("correo");
+        correoInput.addEventListener("blur", () => {
+            if (correoInput.value.trim()) verificarCorreo(correoInput.value);
+        });
+        correoInput.addEventListener("input", () => mostrarEstadoCorreo("", ""));
     });
+  </script>
+
+  <!-- Verificación de correo electrónico -->
+  <script>
+    // Dominios de correo temporal / desechable más comunes
+    const DOMINIOS_DESECHABLES = new Set([
+        "mailinator.com", "guerrillamail.com", "guerrillamail.net", "sharklasers.com",
+        "10minutemail.com", "10minutemail.net", "tempmail.com", "temp-mail.org", "temp-mail.io",
+        "yopmail.com", "yopmail.net", "trashmail.com", "getnada.com", "nada.email",
+        "dispostable.com", "maildrop.cc", "throwawaymail.com", "fakeinbox.com",
+        "mohmal.com", "emailondeck.com", "mintemail.com", "mailnesia.com",
+        "tempinbox.com", "spamgourmet.com", "moakt.com", "tmail.ws", "tmpmail.org",
+        "burnermail.io", "inboxkitten.com", "mailcatch.com", "emailfake.com"
+    ]);
+
+    // Errores de escritura frecuentes -> dominio sugerido
+    const CORRECCIONES_DOMINIO = {
+        "gmial.com": "gmail.com", "gmai.com": "gmail.com", "gamil.com": "gmail.com",
+        "gmail.co": "gmail.com", "gmail.con": "gmail.com", "gmail.cm": "gmail.com", "gnail.com": "gmail.com",
+        "hotmial.com": "hotmail.com", "hotmai.com": "hotmail.com", "hotmail.con": "hotmail.com",
+        "hotmail.co": "hotmail.com", "hotmal.com": "hotmail.com",
+        "outlok.com": "outlook.com", "outloo.com": "outlook.com", "outlook.con": "outlook.com",
+        "yaho.com": "yahoo.com", "yahoo.con": "yahoo.com", "yahooo.com": "yahoo.com",
+        "iclod.com": "icloud.com", "icloud.con": "icloud.com"
+    };
+
+    const REGEX_CORREO = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+
+    const cacheDominios = {};
+
+    function mostrarEstadoCorreo(mensaje, tipo) {
+        const estado = document.getElementById("correoEstado");
+        const colores = { ok: "#1e8e3e", error: "#d93025", info: "#5f6368" };
+        estado.textContent = mensaje;
+        estado.style.color = colores[tipo] || "";
+    }
+
+    // Consulta por DNS-over-HTTPS si el dominio tiene servidores de correo (registros MX)
+    async function dominioRecibeCorreo(dominio) {
+        if (dominio in cacheDominios) return cacheDominios[dominio];
+
+        const proveedores = [
+            `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(dominio)}&type=MX`,
+            `https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=MX`
+        ];
+
+        for (const url of proveedores) {
+            try {
+                const resp = await fetch(url, { headers: { "Accept": "application/dns-json" } });
+                if (!resp.ok) continue;
+                const data = await resp.json();
+
+                if (data.Status === 3) return (cacheDominios[dominio] = false); // NXDOMAIN: el dominio no existe
+                if (data.Status !== 0) continue;
+
+                const mx = (data.Answer || []).filter(r => r.type === 15);
+                // "Null MX" (0 .) significa que el dominio declara que NO recibe correo
+                const valido = mx.some(r => !/^\s*0\s+\.?\s*$/.test(r.data));
+                return (cacheDominios[dominio] = valido);
+            } catch (e) {
+                // Intentar con el siguiente proveedor
+            }
+        }
+        return null; // No se pudo comprobar (sin conexión al servicio DNS)
+    }
+
+    /**
+     * Verifica el correo y devuelve { valido: boolean, mensaje: string, sugerencia?: string }
+     */
+    async function verificarCorreo(valor) {
+        const correo = (valor || "").trim().toLowerCase();
+
+        if (!REGEX_CORREO.test(correo) || correo.includes("..")) {
+            const r = { valido: false, mensaje: "El formato del correo no es válido." };
+            mostrarEstadoCorreo(r.mensaje, "error");
+            return r;
+        }
+
+        const dominio = correo.split("@")[1];
+
+        if (CORRECCIONES_DOMINIO[dominio]) {
+            const sugerencia = correo.split("@")[0] + "@" + CORRECCIONES_DOMINIO[dominio];
+            const r = { valido: false, mensaje: `¿Quisiste decir ${sugerencia}?`, sugerencia };
+            mostrarEstadoCorreo(r.mensaje, "error");
+            return r;
+        }
+
+        if (DOMINIOS_DESECHABLES.has(dominio)) {
+            const r = { valido: false, mensaje: "No se permiten correos temporales o desechables." };
+            mostrarEstadoCorreo(r.mensaje, "error");
+            return r;
+        }
+
+        mostrarEstadoCorreo("Verificando dominio del correo...", "info");
+        const recibe = await dominioRecibeCorreo(dominio);
+
+        if (recibe === false) {
+            const r = { valido: false, mensaje: `El dominio "${dominio}" no existe o no puede recibir correos.` };
+            mostrarEstadoCorreo(r.mensaje, "error");
+            return r;
+        }
+
+        if (recibe === null) {
+            const r = { valido: true, mensaje: "No se pudo comprobar el dominio; se validó solo el formato." };
+            mostrarEstadoCorreo(r.mensaje, "info");
+            return r;
+        }
+
+        const r = { valido: true, mensaje: "Correo verificado." };
+        mostrarEstadoCorreo(r.mensaje, "ok");
+        return r;
+    }
+
+    let registroEnCurso = false;
+
+    async function registrarConVerificacion() {
+        if (registroEnCurso) return;
+        const correoInput = document.getElementById("correo");
+        const saveBtn = document.getElementById("saveBtn");
+
+        if (!correoInput.value.trim()) {
+            crearcuenta(); // deja que crearcuenta muestre la alerta de campos incompletos
+            return;
+        }
+
+        registroEnCurso = true;
+        saveBtn.disabled = true;
+        try {
+            const resultado = await verificarCorreo(correoInput.value);
+
+            if (!resultado.valido) {
+                if (resultado.sugerencia) {
+                    const { isConfirmed } = await Swal.fire({
+                        icon: "question",
+                        title: "Revisa tu correo",
+                        text: resultado.mensaje,
+                        showCancelButton: true,
+                        confirmButtonText: "Sí, corregir",
+                        cancelButtonText: "No, editar",
+                        confirmButtonColor: "#004982"
+                    });
+                    if (isConfirmed) {
+                        correoInput.value = resultado.sugerencia;
+                        await verificarCorreo(resultado.sugerencia);
+                    }
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Correo no válido",
+                        text: resultado.mensaje,
+                        confirmButtonColor: "#004982"
+                    });
+                }
+                correoInput.focus();
+                return;
+            }
+
+            correoInput.value = correoInput.value.trim().toLowerCase();
+            crearcuenta();
+        } finally {
+            registroEnCurso = false;
+            saveBtn.disabled = false;
+        }
+    }
   </script>
 
 </body>

@@ -10,6 +10,7 @@
     <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert2@9.5.3/dist/sweetalert2.all.min.js"></script> 
     <script src="js/script.js" defer></script>
+    <script src="js/select-buscable.js"></script>
 </head>
 
 <body>
@@ -468,7 +469,8 @@
             slider.addEventListener('input', function () { el(salidaId).textContent = this.value; });
         });
 
-        // Dropdown de pozos
+        // Dropdown de pozos (con búsqueda)
+        hacerSelectBuscable('dropdown', { placeholder: 'Escribe la clave o nombre del pozo...' });
         fetch(`${apiUrl()}/lista_pozos`)
             .then(response => {
                 if (!response.ok) throw new Error('No se pudo cargar el listado de pozos.');

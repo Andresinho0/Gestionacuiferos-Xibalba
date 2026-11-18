@@ -1135,7 +1135,7 @@ a.notification-item > i {
 .form-group label {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #334155;
+    color: #ffffff;
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1273,4 +1273,70 @@ a.notification-item > i {
     color: #64748b;
     font-size: 0.85rem;
     margin: 0 0 18px 0;
+}
+
+/* ==========================================
+   SELECT CON BÚSQUEDA (js/select-buscable.js)
+========================================== */
+.select-buscable {
+    position: relative;
+    width: 100%;
+}
+
+.select-buscable > input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 40px;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23004982' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 12px 8px;
+}
+
+.select-buscable-oculto {
+    display: none !important;
+}
+
+.select-buscable-lista {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.select-buscable.abierto .select-buscable-lista {
+    display: block;
+}
+
+.select-buscable-lista li {
+    padding: 8px 12px;
+    color: #004982;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.select-buscable-lista li.activo {
+    background: #e0ecf7;
+}
+
+.select-buscable-lista li.seleccionado {
+    font-weight: 700;
+}
+
+.select-buscable-lista li.select-buscable-vacio {
+    color: #64748b;
+    cursor: default;
+    font-style: italic;
 }
