@@ -1016,14 +1016,27 @@ function detalleMttoHtml(item) {
                 ${grupo('Tipo', v(item.mtto_motor_tipo))}
                 ${grupo('Potencia (HP / KW)', `${v(item.mtto_motor_hp, '0')} HP / ${v(item.mtto_motor_kw, '0')} KW`)}
                 ${grupo('Eficiencia', `${v(item.mtto_motor_eficiencia, '0')}%`)}
-                ${grupo('Bomba (Marca)', v(item.mtto_bomba_marca))}
-                ${grupo('Bomba (Gasto / RPM / HP)', `${v(item.mtto_bomba_lps)} L/s / ${v(item.mtto_bomba_rpm)} RPM / ${v(item.mtto_bomba_hp)} HP`)}
+                ${grupo('Amperaje', `${v(item.mtto_motor_amperaje)} A`)}
+                ${grupo('No. de Serie', v(item.mtto_motor_no_serie))}
             </div>
 
             <div class="tarjeta">
-                <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 2. Equipamiento Eléctrico</h3>
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-faucet-drip"></i> 2. Bomba y Cabezal</h3>
+                ${grupo('Bomba (Marca)', v(item.mtto_bomba_marca))}
+                ${grupo('Gasto', `${v(item.mtto_bomba_lps)} L/s`)}
+                ${grupo('Revoluciones', `${v(item.mtto_bomba_rpm)} RPM`)}
+                ${grupo('Potencia', `${v(item.mtto_bomba_hp)} HP`)}
+                ${grupo('Pasos', v(item.mtto_bomba_pasos))}
+                ${grupo('Bomba (No. de Serie)', v(item.mtto_bomba_no_serie))}
+                ${grupo('Cabezal (Marca / Tamaño)', `${v(item.mtto_cabezal_marca)} / ${v(item.mtto_cabezal_tamano)}`)}
+                ${grupo('Cabezal (No. de Serie)', v(item.mtto_cabezal_no_serie))}
+            </div>
+
+            <div class="tarjeta">
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 3. Equipamiento Eléctrico</h3>
                 ${grupo('Tablero (Tipo / Cap.)', `${v(item.mtto_tablero_tipo)} / ${v(item.mtto_tablero_capacidad, '0')} A`)}
                 ${grupo('Tablero (Marca / HP / Voltaje)', `${v(item.mtto_tablero_marca)} / ${v(item.mtto_tablero_hp)} HP / ${v(item.mtto_tablero_voltaje)} V`)}
+                ${grupo('Tablero (No. de Serie)', v(item.mtto_tablero_no_serie))}
                 ${grupo('Transformador (Marca / Cap.)', `${v(item.mtto_transformador_marca || item.mtto_transformador_tipo)} / ${v(item.mtto_transformador_capacidad, '0')} kVA`)}
                 ${grupo('Transformador Seco', v(item.mtto_trans_seco))}
                 ${grupo('Panel Solar / Baterías', `${v(item.mtto_panel_solar)} / ${v(item.mtto_banco_baterias)}`)}
@@ -1031,15 +1044,15 @@ function detalleMttoHtml(item) {
             </div>
 
             <div class="tarjeta">
-                <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 3. Medidores y Tubería</h3>
-                ${grupo('Medidores (Presión / Flujo)', `${v(item.mtto_medidor_presion, '0')} kg/cm² / ${v(item.mtto_medidor_flujo, '0')} L/s`)}
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 4. Medidores y Tubería</h3>
+                ${grupo('Manómetro / Medidor de flujo', `${v(item.mtto_medidor_presion, '0')} kg/cm² / ${v(item.mtto_medidor_flujo, '0')} L/s`)}
                 ${grupo('Medidores N.E. / N.D.', `${v(item.mtto_medidor_NE)} / ${v(item.mtto_medidor_ND)}`)}
                 ${grupo('Tubería (Diámetro / Longitud)', `${v(item.mtto_tuberia_diametro, '0')} in / ${v(item.mtto_tuberia_longitud, '0')} m`)}
                 ${grupo('Poliducto / Sanitaria', `${v(item.mtto_poliducto)} / ${v(item.mtto_sanitaria)}`)}
             </div>
 
             <div class="tarjeta">
-                <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 4. Cableado y Notas</h3>
+                <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 5. Cableado y Notas</h3>
                 ${grupo('Cable Transformador-Arrancador', `Tipo: ${v(item.mtto_cable_transformador)} | Cal: ${v(item.mtto_calibre_arrancador)} | ${v(item.mtto_longitud_arrancador, '0')}m`)}
                 ${grupo('Cable Arrancador-Bomba', `Tipo: ${v(item.mtto_cable_bomba)} | Cal: ${v(item.mtto_calibre_bomba)} | ${v(item.mtto_longitud_bomba, '0')}m`)}
                 ${grupo('Observaciones', v(item.mtto_observaciones, 'Ninguna'), 'font-style:italic;')}
