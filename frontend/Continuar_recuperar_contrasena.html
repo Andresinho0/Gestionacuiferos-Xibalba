@@ -1,35 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva contraseña - XibalbaData</title>
+
     <link rel="stylesheet" href="CSS/Menu_MAIN.css">
-    <title>Continuar Rec. Contraseña</title>
+    <style>
+      .rec-input { width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); font-family: inherit; color: #004982; outline: none; background-color: rgba(255, 255, 255, 0.95); font-size: 1rem; box-sizing: border-box; }
+      .rec-codigo { text-align: center; letter-spacing: 0.5em; font-size: 1.4rem; font-weight: 600; }
+      .rec-texto { color: #ffffff; font-size: 0.95rem; font-weight: 300; line-height: 1.5; margin: 0; }
+      .rec-link { display: block; margin-top: 20px; font-size: 0.95rem; color: #ffffff; text-decoration: underline; font-weight: 300; }
+      .rec-btn { width: 100%; justify-content: center; font-size: 1.05rem; padding: 12px; }
+      .rec-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/recuperar.js" defer></script>
 </head>
+
 <body>
-    <header>
-        <h2>Se ha enviado a su correo electronico un link para restablecer la contraseña.<br>Por favor siga las instrucciones.</h2>
+  <div class="page-content">
+
+    <header class="main-header">
+      <a href="index.html" class="logo-box" title="Ir al inicio">
+        <img src="img/iitca_logo.png" class="logo-img" alt="Logo IITCA">
+      </a>
+      <a href="Inicio_sesion.html" class="nav-btn logout-link">
+        <i class="fa-solid fa-arrow-left"></i>
+        Iniciar sesión
+      </a>
     </header>
-    <section>
-        <a href="Inicio_sesion.html"><img src="img/boton volver.png" width="50"></a>
-    </section>
 
-    <div class="button-container">
-      <!-- Botón de Avanzar -->
-      <button class="btn" onclick="history.forward()" id="forwardBtn" href="Inicio_sesion.html">
-        <a href="inisio-sesion-prueba.html"></a>
-         Regreso a Inicio de Sesión  
-      </button>
-  </div>
+    <main class="login-wrapper" style="display: flex; justify-content: center; align-items: center; flex: 1; padding: 20px;">
+        <div class="panel" style="width: 100%; max-width: 420px; padding: 40px; text-align: center; margin: auto;">
 
+            <h2 class="panel-title">Nueva contraseña</h2>
+            <p class="rec-texto">Mínimo 8 caracteres, al menos una letra y un número.<br>Tienes 10 minutos para completar el cambio.</p>
 
-    <footer>
-      <small>
-        <div class="leyenda"> &copy; Software desarrollado por el Intituto Interamericano de Tecnología y Ciencias del Agua.</span>
-      </small>
+            <form id="formCambiar" novalidate style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+                <input type="password" id="nuevaContrasena" class="rec-input" placeholder="Nueva contraseña" autocomplete="new-password" minlength="8" required>
+                <input type="password" id="confirmarContrasena" class="rec-input" placeholder="Confirmar contraseña" autocomplete="new-password" minlength="8" required>
+
+                <button type="submit" class="btn rec-btn">
+                    <i class="fa-solid fa-key"></i> Cambiar contraseña
+                </button>
+            </form>
+
+            <a href="Inicio_sesion.html" class="rec-link">Cancelar</a>
+        </div>
+    </main>
+
+  </div> <!-- /.page-content -->
+
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i> Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
   </footer>
-      <!--Colocar el texto centrado y en la parte inferior de la pantlla-->
 
-    
 </body>
 </html>

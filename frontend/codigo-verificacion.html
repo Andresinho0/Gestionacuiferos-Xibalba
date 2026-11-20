@@ -3,131 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Recuperar Contraseña</title>
+    <title>Código de verificación - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-size: 14px;
-            color: #333;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #007bff;
-        }
-
-        .info-text {
-            text-align: center;
-            font-size: 14px;
-        }
+      .rec-input { width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); font-family: inherit; color: #004982; outline: none; background-color: rgba(255, 255, 255, 0.95); font-size: 1rem; box-sizing: border-box; }
+      .rec-codigo { text-align: center; letter-spacing: 0.5em; font-size: 1.4rem; font-weight: 600; }
+      .rec-texto { color: #ffffff; font-size: 0.95rem; font-weight: 300; line-height: 1.5; margin: 0; }
+      .rec-link { display: block; margin-top: 20px; font-size: 0.95rem; color: #ffffff; text-decoration: underline; font-weight: 300; }
+      .rec-btn { width: 100%; justify-content: center; font-size: 1.05rem; padding: 12px; }
+      .rec-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
+
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/recuperar.js" defer></script>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Recuperar Contraseña</h2>
-        
-        <!-- Paso 1: Ingresar código de verificación -->
-        <form id="verifyForm">
-            <label for="verificationCode">Código de Verificación</label>
-            <input type="text" id="verificationCode" name="verificationCode" required placeholder="Ingresa el código enviado a tu correo">
-            <button type="submit" class="btn">Verificar Código</button>
-        </form>
+  <div class="page-content">
 
-        <!-- Paso 2: Cambiar contraseña (se oculta hasta que se valide el código) -->
-        <div id="changePasswordForm" style="display: none;">
-            <form>
-                <label for="newPassword">Nueva Contraseña</label>
-                <input type="password" id="newPassword" name="newPassword" required placeholder="Ingresa tu nueva contraseña">
-                
-                <label for="confirmPassword">Confirmar Nueva Contraseña</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirma tu nueva contraseña">
-                
-                <button type="submit" class="btn">Cambiar Contraseña</button>
+    <header class="main-header">
+      <a href="index.html" class="logo-box" title="Ir al inicio">
+        <img src="img/iitca_logo.png" class="logo-img" alt="Logo IITCA">
+      </a>
+      <a href="Inicio_sesion.html" class="nav-btn logout-link">
+        <i class="fa-solid fa-arrow-left"></i>
+        Iniciar sesión
+      </a>
+    </header>
+
+    <main class="login-wrapper" style="display: flex; justify-content: center; align-items: center; flex: 1; padding: 20px;">
+        <div class="panel" style="width: 100%; max-width: 420px; padding: 40px; text-align: center; margin: auto;">
+
+            <h2 class="panel-title">Código de verificación</h2>
+            <p class="rec-texto">Si el correo está registrado, enviamos un código a <strong id="correoDestino"></strong>.<br>Vence en 15 minutos.</p>
+
+            <form id="formVerificar" novalidate style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+                <input type="text" id="codigoVerificacion" class="rec-input rec-codigo" placeholder="000000"
+                       inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" required>
+
+                <button type="submit" class="btn rec-btn">
+                    <i class="fa-solid fa-check"></i> Verificar código
+                </button>
+
+                <button type="button" id="btnReenviar" class="btn btn-outline rec-btn">
+                    <i class="fa-solid fa-rotate-right"></i> Reenviar código
+                </button>
             </form>
+
+            <a href="recuperar_contrasena.html" id="usarOtroCorreo" class="rec-link">Usar otro correo</a>
         </div>
+    </main>
 
-        <!-- Información adicional -->
-        <div class="info-text">
-            <p id="infoText">Te enviamos un código de verificación a tu correo. Por favor ingrésalo en el campo de arriba.</p>
-        </div>
-    </div>
+  </div> <!-- /.page-content -->
 
-    <script>
-        // Simular el proceso de verificación de código
-        const verificationCode = "123456"; // Este sería el código real que se envía al correo
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i> Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
+  </footer>
 
-        document.getElementById("verifyForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const userCode = document.getElementById("verificationCode").value;
-            
-            if (userCode === verificationCode) {
-                document.getElementById("verifyForm").style.display = "none";
-                document.getElementById("changePasswordForm").style.display = "block";
-                document.getElementById("infoText").textContent = "Ahora ingresa tu nueva contraseña.";
-            } else {
-                alert("El código de verificación es incorrecto. Intenta de nuevo.");
-            }
-        });
-
-        // Lógica para cambiar la contraseña
-        document.getElementById("changePasswordForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const newPassword = document.getElementById("newPassword").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-            
-            if (newPassword === confirmPassword) {
-                alert("Tu contraseña ha sido cambiada con éxito.");
-                // Aquí puedes agregar el código para enviar la nueva contraseña al servidor
-            } else {
-                alert("Las contraseñas no coinciden. Por favor, intenta de nuevo.");
-            }
-        });
-    </script>
 </body>
 </html>

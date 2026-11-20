@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar contraseña - XibalbaData</title>
+
+    <link rel="stylesheet" href="CSS/Menu_MAIN.css">
+    <style>
+      .rec-input { width: 100%; padding: 12px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); font-family: inherit; color: #004982; outline: none; background-color: rgba(255, 255, 255, 0.95); font-size: 1rem; box-sizing: border-box; }
+      .rec-codigo { text-align: center; letter-spacing: 0.5em; font-size: 1.4rem; font-weight: 600; }
+      .rec-texto { color: #ffffff; font-size: 0.95rem; font-weight: 300; line-height: 1.5; margin: 0; }
+      .rec-link { display: block; margin-top: 20px; font-size: 0.95rem; color: #ffffff; text-decoration: underline; font-weight: 300; }
+      .rec-btn { width: 100%; justify-content: center; font-size: 1.05rem; padding: 12px; }
+      .rec-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+
+    <script src="https://kit.fontawesome.com/7f2bc339d8.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/recuperar.js" defer></script>
+</head>
+
+<body>
+  <div class="page-content">
+
+    <header class="main-header">
+      <a href="index.html" class="logo-box" title="Ir al inicio">
+        <img src="img/iitca_logo.png" class="logo-img" alt="Logo IITCA">
+      </a>
+      <a href="Inicio_sesion.html" class="nav-btn logout-link">
+        <i class="fa-solid fa-arrow-left"></i>
+        Iniciar sesión
+      </a>
+    </header>
+
+    <main class="login-wrapper" style="display: flex; justify-content: center; align-items: center; flex: 1; padding: 20px;">
+        <div class="panel" style="width: 100%; max-width: 420px; padding: 40px; text-align: center; margin: auto;">
+
+            <h2 class="panel-title">Recuperar contraseña</h2>
+            <p class="rec-texto">Ingresa el correo electrónico con el que te registraste. Te enviaremos un código de 6 dígitos.</p>
+
+            <form id="formSolicitar" novalidate style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+                <input type="email" id="correoRecuperar" class="rec-input" placeholder="Correo" autocomplete="email" required>
+
+                <button type="submit" class="btn rec-btn">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar código
+                </button>
+            </form>
+
+            <a href="Inicio_sesion.html" class="rec-link">Volver al inicio de sesión</a>
+        </div>
+    </main>
+
+  </div> <!-- /.page-content -->
+
+  <footer>
+    <small>
+      <i class="fa-regular fa-copyright"></i> Software desarrollado por el Instituto Interamericano de Tecnología y Ciencias del Agua.
+    </small>
+  </footer>
+
+</body>
+</html>
