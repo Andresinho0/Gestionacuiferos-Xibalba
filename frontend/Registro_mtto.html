@@ -28,6 +28,49 @@
             justify-content: flex-end;
         }
 
+        /* Texto oscuro dentro de las tarjetas blancas
+           (el estilo global de .form-group label ahora es blanco) */
+        .tarjeta .form-group label,
+        .tarjeta .slider-container label {
+            color: #334155;
+        }
+
+        /* Tarjetas horizontales: una por fila, campos en cuadrícula */
+        .cards-grid.cards-horizontal {
+            grid-template-columns: 1fr;
+        }
+
+        .cards-horizontal .tarjeta-cuerpo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 16px 20px;
+            align-items: end;
+        }
+
+        .cards-horizontal .tarjeta-cuerpo .form-group {
+            margin-bottom: 0;
+        }
+
+        .cards-horizontal .subseccion {
+            grid-column: 1 / -1;
+            color: #004982;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 4px;
+            margin-top: 8px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .cards-horizontal .subseccion:first-child {
+            margin-top: 0;
+        }
+
+        .cards-horizontal .campo-ancho {
+            grid-column: 1 / -1;
+        }
+
         @media (max-width: 600px) {
             .tarjeta-principal .grid-2-col {
                 grid-template-columns: 1fr;
@@ -67,42 +110,21 @@
           </div>
       </div>
 
-      <!-- Contenedor Grid de Tarjetas -->
-      <div class="cards-grid">
+      <!-- Contenedor de Tarjetas (horizontales, una por fila) -->
+      <div class="cards-grid cards-horizontal">
 
         <!-- TARJETA 1: Motor -->
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-gear"></i> 1. Motor</h3>
-
-            <div class="form-group">
-                <label for="motorTipo">Tipo de Motor</label>
-                <select id="motorTipo">
-                    <option value="">Seleccione una opción</option>
-                    <option value="Convencional">Convencional</option>
-                    <option value="Sumergible">Sumergible</option>
-                </select>
-            </div>
-
-            <!-- Sliders de Potencia -->
-            <div class="slider-container">
-                <label for="motorHp">Potencia (HP):</label>
-                <input type="range" min="0" max="150" value="0" class="slider" id="motorHp">
-                <div class="slider-value">Valor seleccionado: <b id="val_motorHp" style="color: #004982;">0</b> HP</div>
-            </div>
-
-            <div class="slider-container">
-                <label for="motorKw">Potencia (KW):</label>
-                <input type="range" min="0" max="150" value="0" class="slider" id="motorKw">
-                <div class="slider-value">Valor seleccionado: <b id="val_motorKw" style="color: #004982;">0</b> KW</div>
-            </div>
-
-            <div class="slider-container">
-                <label for="motorEficiencia">Eficiencia del Motor (%):</label>
-                <input type="range" min="0" max="100" step="1" value="0" class="slider" id="motorEficiencia">
-                <div class="slider-value">Valor seleccionado: <b id="val_motorEficiencia" style="color: #004982;">0</b> %</div>
-            </div>
-
-            <div class="grid-2-col inputs-alineados">
+            <div class="tarjeta-cuerpo">
+                <div class="form-group">
+                    <label for="motorTipo">Tipo de Motor</label>
+                    <select id="motorTipo">
+                        <option value="">Seleccione una opción</option>
+                        <option value="Convencional">Convencional</option>
+                        <option value="Sumergible">Sumergible</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="motorAmperaje">Amperaje (A)</label>
                     <input type="number" step="0.01" min="0" id="motorAmperaje" placeholder="Ej. 95.5">
@@ -111,19 +133,34 @@
                     <label for="motorNoSerie">No. de Serie</label>
                     <input type="number" step="1" min="0" id="motorNoSerie" placeholder="Ej. 123456">
                 </div>
-            </div>
 
+                <div class="slider-container">
+                    <label for="motorHp">Potencia (HP):</label>
+                    <input type="range" min="0" max="150" value="0" class="slider" id="motorHp">
+                    <div class="slider-value">Valor seleccionado: <b id="val_motorHp" style="color: #004982;">0</b> HP</div>
+                </div>
+                <div class="slider-container">
+                    <label for="motorKw">Potencia (KW):</label>
+                    <input type="range" min="0" max="150" value="0" class="slider" id="motorKw">
+                    <div class="slider-value">Valor seleccionado: <b id="val_motorKw" style="color: #004982;">0</b> KW</div>
+                </div>
+                <div class="slider-container">
+                    <label for="motorEficiencia">Eficiencia del Motor (%):</label>
+                    <input type="range" min="0" max="100" step="1" value="0" class="slider" id="motorEficiencia">
+                    <div class="slider-value">Valor seleccionado: <b id="val_motorEficiencia" style="color: #004982;">0</b> %</div>
+                </div>
+            </div>
         </div>
 
-        <!-- TARJETA 2: Bomba -->
+        <!-- TARJETA 2: Bomba y Cabezal -->
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-faucet-drip"></i> 2. Bomba y Cabezal</h3>
-
-            <div class="form-group">
-                <label for="bombaMarca">Marca</label>
-                <input type="text" id="bombaMarca" placeholder="Ej. Grundfos">
-            </div>
-            <div class="grid-2-col inputs-alineados">
+            <div class="tarjeta-cuerpo">
+                <div class="subseccion">Bomba</div>
+                <div class="form-group">
+                    <label for="bombaMarca">Marca</label>
+                    <input type="text" id="bombaMarca" placeholder="Ej. Grundfos">
+                </div>
                 <div class="form-group">
                     <label for="bombaLps">Gasto (L/s)</label>
                     <input type="number" step="0.01" min="0" id="bombaLps" placeholder="0.00">
@@ -132,12 +169,10 @@
                     <label for="bombaRpm">Revoluciones (RPM)</label>
                     <input type="number" step="1" min="0" id="bombaRpm" placeholder="Ej. 1760">
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="bombaHp">Potencia (Hp)</label>
-                <input type="number" step="0.01" min="0" id="bombaHp" placeholder="Ej. 75">
-            </div>
-            <div class="grid-2-col inputs-alineados">
+                <div class="form-group">
+                    <label for="bombaHp">Potencia (Hp)</label>
+                    <input type="number" step="0.01" min="0" id="bombaHp" placeholder="Ej. 75">
+                </div>
                 <div class="form-group">
                     <label for="bombaPasos">Pasos</label>
                     <input type="number" step="1" min="0" id="bombaPasos" placeholder="Ej. 8">
@@ -146,14 +181,12 @@
                     <label for="bombaNoSerie">No. de Serie</label>
                     <input type="number" step="1" min="0" id="bombaNoSerie" placeholder="Ej. 123456">
                 </div>
-            </div>
 
-            <label style="color:#004982; font-weight: bold; margin-bottom: 10px;">Cabezal</label>
-            <div class="form-group">
-                <label for="cabezalMarca">Marca</label>
-                <input type="text" id="cabezalMarca" placeholder="Ej. Grundfos">
-            </div>
-            <div class="grid-2-col inputs-alineados">
+                <div class="subseccion">Cabezal</div>
+                <div class="form-group">
+                    <label for="cabezalMarca">Marca</label>
+                    <input type="text" id="cabezalMarca" placeholder="Ej. Grundfos">
+                </div>
                 <div class="form-group">
                     <label for="cabezalTamano">Tamaño</label>
                     <input type="number" step="0.01" min="0" id="cabezalTamano" placeholder="Ej. 8">
@@ -162,34 +195,55 @@
                     <label for="cabezalNoSerie">No. de Serie</label>
                     <input type="number" step="1" min="0" id="cabezalNoSerie" placeholder="Ej. 123456">
                 </div>
+
+                <div class="subseccion">Cable Arrancador - Bomba</div>
+                <div class="form-group">
+                    <label for="cableBomba">Material</label>
+                    <select id="cableBomba">
+                        <option value="">Seleccione material</option>
+                        <option value="Aluminio">Aluminio</option>
+                        <option value="Cobre">Cobre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="calibreBomba">Calibre</label>
+                    <select id="calibreBomba">
+                        <option value="">Seleccione calibre</option>
+                        <option value="0">0</option>
+                        <option value="00">00</option>
+                        <option value="000">000</option>
+                    </select>
+                </div>
+                <div class="slider-container">
+                    <label for="longitudBomba">Longitud (m):</label>
+                    <input type="range" min="0" max="30" value="0" class="slider" id="longitudBomba">
+                    <div class="slider-value">Valor seleccionado: <b id="val_longitudBomba" style="color: #004982;">0</b> m</div>
+                </div>
             </div>
         </div>
 
         <!-- TARJETA 3: Equipamiento Eléctrico -->
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-bolt"></i> 3. Equipamiento Eléctrico</h3>
-            
-            <div class="form-group">
-                <label for="tableroTipo">Tablero (Tipo)</label>
-                <select id="tableroTipo">
-                    <option value="">Seleccione tipo</option>
-                    <option value="Monofásico">Monofásico</option>
-                    <option value="Bifásico">Bifásico</option>
-                    <option value="Trifásico">Trifásico</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="tableroMarca">Marca del Tablero</label>
-                <input type="text" id="tableroMarca" placeholder="Ej. Schneider">
-            </div>
-
-            <div class="form-group">
-                <label for="tableroNoSerie">No. de Serie del Tablero</label>
-                <input type="number" step="1" min="0" id="tableroNoSerie" placeholder="Ej. 123456">
-            </div>
-
-            <div class="grid-2-col">
+            <div class="tarjeta-cuerpo">
+                <div class="subseccion">Tablero</div>
+                <div class="form-group">
+                    <label for="tableroTipo">Tipo</label>
+                    <select id="tableroTipo">
+                        <option value="">Seleccione tipo</option>
+                        <option value="Monofásico">Monofásico</option>
+                        <option value="Bifásico">Bifásico</option>
+                        <option value="Trifásico">Trifásico</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tableroMarca">Marca</label>
+                    <input type="text" id="tableroMarca" placeholder="Ej. Schneider">
+                </div>
+                <div class="form-group">
+                    <label for="tableroNoSerie">No. de Serie</label>
+                    <input type="number" step="1" min="0" id="tableroNoSerie" placeholder="Ej. 123456">
+                </div>
                 <div class="form-group">
                     <label for="tableroHp">Capacidad (Hp)</label>
                     <input type="number" step="0.01" min="0" id="tableroHp" placeholder="Ej. 75">
@@ -198,26 +252,21 @@
                     <label for="tableroVoltaje">Voltaje (V)</label>
                     <input type="number" step="1" min="0" id="tableroVoltaje" placeholder="Ej. 440">
                 </div>
-            </div>
+                <div class="slider-container">
+                    <label for="tableroCap">Capacidad del Tablero (A):</label>
+                    <input type="range" min="50" max="200" value="50" class="slider" id="tableroCap">
+                    <div class="slider-value">Valor seleccionado: <b id="val_tableroCap" style="color: #004982;">50</b> A</div>
+                </div>
 
-            <!-- Slider de Capacidad del Tablero -->
-            <div class="slider-container">
-                <label for="tableroCap">Capacidad del Tablero (A):</label>
-                <input type="range" min="50" max="200" value="50" class="slider" id="tableroCap">
-                <div class="slider-value">Valor seleccionado: <b id="val_tableroCap" style="color: #004982;">50</b> A</div>
-            </div>
-
-            <div class="form-group">
-                <label for="transSeco">Transformador Seco</label>
-                <select id="transSeco">
-                    <option value="">Seleccione opción</option>
-                    <option value="Elevado">Elevado</option>
-                    <option value="Pedestal">Pedestal</option>
-                </select>
-            </div>
-
-            <label style="color:#004982; font-weight: bold;">Transformador</label>
-            <div class="grid-2-col">
+                <div class="subseccion">Transformador</div>
+                <div class="form-group">
+                    <label for="transSeco">Transformador Seco</label>
+                    <select id="transSeco">
+                        <option value="">Seleccione opción</option>
+                        <option value="Elevado">Elevado</option>
+                        <option value="Pedestal">Pedestal</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="transMarca">Marca</label>
                     <input type="text" id="transMarca" placeholder="Ej. Prolec">
@@ -231,70 +280,51 @@
                         <option value="440">440</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="grid-2-col">
+                <div class="subseccion">Cable Transformador - Arrancador</div>
                 <div class="form-group">
-                    <label for="panelSolar">Panel Solar</label>
-                    <select id="panelSolar">
-                        <option value="No">No</option>
-                        <option value="Si">Sí</option>
+                    <label for="cableTrans">Material</label>
+                    <select id="cableTrans">
+                        <option value="">Seleccione material</option>
+                        <option value="Aluminio">Aluminio</option>
+                        <option value="Cobre">Cobre</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="bancoBaterias">Banco de Baterías</label>
-                    <select id="bancoBaterias">
-                        <option value="No">No</option>
-                        <option value="Si">Sí</option>
+                    <label for="calibreArrancador">Calibre</label>
+                    <select id="calibreArrancador">
+                        <option value="">Seleccione calibre</option>
+                        <option value="0">0</option>
+                        <option value="00">00</option>
+                        <option value="000">000</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="sistemaTierras">Sistema de Tierras</label>
-                <select id="sistemaTierras">
-                    <option value="No">No</option>
-                    <option value="Si">Sí</option>
-                </select>
+                <div class="form-group">
+                    <label for="longitudArrancador">Longitud (m)</label>
+                    <input type="number" step="0.01" min="0" id="longitudArrancador" placeholder="Ej. 12.5">
+                </div>
             </div>
         </div>
 
         <!-- TARJETA 4: Tubería y Medidores -->
         <div class="tarjeta">
             <h3 class="tarjeta-titulo"><i class="fa-solid fa-ruler-combined"></i> 4. Tubería y Medidores</h3>
-            
-            <div class="form-group">
-                <label for="diametroTuberia">Diámetro Tubería (in)</label>
-                <select id="diametroTuberia">
-                    <option value="">Seleccione diámetro</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
-                    <option value="8">8</option>
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                </select>
-            </div>
-            
-            <!-- Slider Longitud Tubería -->
-            <div class="slider-container">
-                <label for="longitudTuberia">Longitud Tubería (m):</label>
-                <input type="range" min="30" max="250" value="30" class="slider" id="longitudTuberia">
-                <div class="slider-value">Valor seleccionado: <b id="val_longitudTuberia" style="color: #004982;">30</b> m</div>
-            </div>
-
-            <!-- Slider Presión -->
-            <div class="slider-container">
-                <label for="medidorPresion">Manómetro (kg/cm²):</label>
-                <input type="range" min="0" max="10" step="0.01" value="0" class="slider" id="medidorPresion">
-                <div class="slider-value">Valor seleccionado: <b id="val_medidorPresion" style="color: #004982;">0</b> kg/cm²</div>
-            </div>
-
-            <div class="form-group">
-                <label for="medidorFlujo">Medidor de flujo (L/s)</label>
-                <input type="number" step="0.01" min="0" id="medidorFlujo" placeholder="0.00">
-            </div>
-
-            <div class="grid-2-col">
+            <div class="tarjeta-cuerpo">
+                <div class="form-group">
+                    <label for="diametroTuberia">Diámetro Tubería (in)</label>
+                    <select id="diametroTuberia">
+                        <option value="">Seleccione diámetro</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                        <option value="10">10</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="medidorFlujo">Medidor de flujo (L/s)</label>
+                    <input type="number" step="0.01" min="0" id="medidorFlujo" placeholder="0.00">
+                </div>
                 <div class="form-group">
                     <label for="medidorNE">Medidor N.E.</label>
                     <select id="medidorNE">
@@ -309,9 +339,44 @@
                         <option value="Si">Sí</option>
                     </select>
                 </div>
+                <div class="slider-container">
+                    <label for="longitudTuberia">Longitud Tubería (m):</label>
+                    <input type="range" min="30" max="250" value="30" class="slider" id="longitudTuberia">
+                    <div class="slider-value">Valor seleccionado: <b id="val_longitudTuberia" style="color: #004982;">30</b> m</div>
+                </div>
+                <div class="slider-container">
+                    <label for="medidorPresion">Manómetro (kg/cm²):</label>
+                    <input type="range" min="0" max="10" step="0.01" value="0" class="slider" id="medidorPresion">
+                    <div class="slider-value">Valor seleccionado: <b id="val_medidorPresion" style="color: #004982;">0</b> kg/cm²</div>
+                </div>
             </div>
+        </div>
 
-            <div class="grid-2-col">
+        <!-- TARJETA 5: Instalaciones y Notas -->
+        <div class="tarjeta">
+            <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 5. Instalaciones y Notas</h3>
+            <div class="tarjeta-cuerpo">
+                <div class="form-group">
+                    <label for="panelSolar">Panel Solar</label>
+                    <select id="panelSolar">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bancoBaterias">Banco de Baterías</label>
+                    <select id="bancoBaterias">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sistemaTierras">Sistema de Tierras</label>
+                    <select id="sistemaTierras">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="poliducto">Poliducto</label>
                     <select id="poliducto">
@@ -326,73 +391,11 @@
                         <option value="Si">Sí</option>
                     </select>
                 </div>
-            </div>
-        </div>
 
-        <!-- TARJETA 5: Cableado y Observaciones -->
-        <div class="tarjeta">
-            <h3 class="tarjeta-titulo"><i class="fa-solid fa-plug"></i> 5. Cableado y Notas</h3>
-
-            <div class="form-group" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
-                <label style="color:#004982;">Cable Transformador - Arrancador</label>
-                <div class="grid-2-col" style="margin-top: 10px;">
-                    <div class="form-group">
-                        <label for="cableTrans">Material</label>
-                        <select id="cableTrans">
-                            <option value="">Seleccione material</option>
-                            <option value="Aluminio">Aluminio</option>
-                            <option value="Cobre">Cobre</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="calibreArrancador">Calibre</label>
-                        <select id="calibreArrancador">
-                            <option value="">Seleccione calibre</option>
-                            <option value="0">0</option>
-                            <option value="00">00</option>
-                            <option value="000">000</option>
-                        </select>
-                    </div>
+                <div class="form-group campo-ancho">
+                    <label for="observaciones">Observaciones</label>
+                    <textarea id="observaciones" rows="3" placeholder="Escriba aquí los detalles adicionales..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="longitudArrancador">Longitud (m)</label>
-                    <input type="number" step="0.01" min="0" id="longitudArrancador" placeholder="Ej. 12.5" style="width: 100%;">
-                </div>
-            </div>
-
-            <div class="form-group" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
-                <label style="color:#004982;">Cable Arrancador - Bomba</label>
-                <div class="grid-2-col" style="margin-top: 10px;">
-                    <div class="form-group">
-                        <label for="cableBomba">Material</label>
-                        <select id="cableBomba">
-                            <option value="">Seleccione material</option>
-                            <option value="Aluminio">Aluminio</option>
-                            <option value="Cobre">Cobre</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="calibreBomba">Calibre</label>
-                        <select id="calibreBomba">
-                            <option value="">Seleccione calibre</option>
-                            <option value="0">0</option>
-                            <option value="00">00</option>
-                            <option value="000">000</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Slider Longitud Cable Arrancador - Bomba -->
-                <div class="slider-container" style="margin-top: 10px;">
-                    <label for="longitudBomba">Longitud (m):</label>
-                    <input type="range" min="0" max="30" value="0" class="slider" id="longitudBomba">
-                    <div class="slider-value">Valor seleccionado: <b id="val_longitudBomba" style="color: #004982;">0</b> m</div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="observaciones">Observaciones</label>
-                <textarea id="observaciones" rows="3" placeholder="Escriba aquí los detalles adicionales..."></textarea>
             </div>
         </div>
 

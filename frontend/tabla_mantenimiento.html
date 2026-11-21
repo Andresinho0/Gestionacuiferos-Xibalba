@@ -20,6 +20,29 @@
             margin-top: 15px;
         }
 
+        /* Tarjetas horizontales: una por fila, datos en cuadrícula */
+        .cards-grid.cards-horizontal {
+            grid-template-columns: 1fr;
+        }
+
+        .cards-horizontal .tarjeta-cuerpo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px 20px;
+        }
+
+        .cards-horizontal .detail-group,
+        .cards-horizontal .detail-group:last-child {
+            margin: 0;
+            padding: 2px 0 2px 10px;
+            border-bottom: none;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .cards-horizontal .campo-ancho {
+            grid-column: 1 / -1;
+        }
+
         .tarjeta {
             background: #ffffff;
             border: 1px solid #e2e8f0;
