@@ -1135,10 +1135,15 @@ a.notification-item > i {
 .form-group label {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #334155;
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Registro de usuarios: etiquetas en blanco sobre fondo oscuro */
+.form-grid .form-group label {
+    color: #ffffff;
 }
 
 .form-group input,
